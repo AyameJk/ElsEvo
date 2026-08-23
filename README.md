@@ -95,7 +95,7 @@ Uso não comercial. Este é um projeto pessoal, sem vínculo oficial com a KOG G
 Desenvolvido por **[AyameJk](https://github.com/AyameJk)**
 
 <p align="center">
-  <img width="602" height="422" alt="ElsEvo_logo" src="COLE_AQUI_A_NOVA_URL_DA_IMAGEM"/>
+  <img width="602" height="422" alt="ElsEvo_logo" src="https://github.com/user-attachments/assets/b67ab653-31fe-4eca-8d01-fe4438565ef9" />
 </p>
 
 <p align="center">
