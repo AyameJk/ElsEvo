@@ -9,6 +9,10 @@
     <RootNamespace>ElsEvo</RootNamespace>
     <AssemblyName>ElsEvo</AssemblyName>
     <ApplicationIcon>Assets\icone_app.ico</ApplicationIcon>
+    <!-- Permite restaurar/compilar o projeto em runners Linux (usado pelo workflow
+         automático de submissão de dependências do GitHub para o grafo/Dependabot).
+         O build de release continua sendo feito em windows-latest normalmente. -->
+    <EnableWindowsTargeting>true</EnableWindowsTargeting>
   </PropertyGroup>
 
   <ItemGroup>
