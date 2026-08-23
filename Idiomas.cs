@@ -3,12 +3,7 @@ using System.Collections.Generic;
 
 namespace ElsEvo
 {
-    /// <summary>
-    /// Sistema de idiomas simples: um dicionário de textos por idioma, com evento
-    /// pra avisar as janelas abertas quando o idioma muda (assim elas se atualizam
-    /// sem precisar reabrir). Cobre as strings principais da interface; dá pra
-    /// expandir facilmente adicionando mais chaves nos três dicionários abaixo.
-    /// </summary>
+
     public static class Idiomas
     {
         public static event Action? IdiomaMudou;

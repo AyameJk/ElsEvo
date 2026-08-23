@@ -19,7 +19,7 @@ namespace ElsEvo
         public GerenciarModsWindow()
         {
             InitializeComponent();
-            ThemeManager.AplicarTemaSalvo(); // reforço de segurança
+            ThemeManager.AplicarTemaSalvo();
             CarregarModsJaImportados();
             AtualizarComboGlobal();
             AplicarFiltro();
@@ -29,10 +29,9 @@ namespace ElsEvo
             SourceInitialized += (_, _) =>
                 BarraTituloNativa.AplicarTema(this, !Properties.Settings.Default.TemaClaro);
 
-            BtnAplicar.IsEnabled = false; // nada mudou ainda
+            BtnAplicar.IsEnabled = false;
         }
 
-        /// <summary>"Aplicar" liga assim que algo muda (mod trocado, pack importado/excluído, etc.).</summary>
         private void MarcarAlteracaoPendente() => BtnAplicar.IsEnabled = true;
 
         private void InscreverAlteracoes(IEnumerable<ModItem> itens)
@@ -49,17 +48,11 @@ namespace ElsEvo
             BtnAplicar.Content = Idiomas.T("BotaoAplicar");
         }
 
-        /// <summary>
-        /// Lê o catálogo de mods a partir da PASTA DE PACKS de verdade (fonte confiável),
-        /// não da lista de "ativos" — senão, desabilitar tudo e salvar fazia a lista de
-        /// ativos ficar vazia, e a próxima vez que abria essa janela, tudo desaparecia.
-        /// </summary>
         private void CarregarModsJaImportados()
         {
             var ativos = GerenciadorDeMods.Carregar()
                 .ToDictionary(a => a.Arquivo, a => a.NomeDoPack, StringComparer.OrdinalIgnoreCase);
 
-            // Arquivo -> lista de packs que contêm esse arquivo
             var porArquivo = new Dictionary<string, List<string>>(StringComparer.OrdinalIgnoreCase);
 
             if (Directory.Exists(Paths.Main.Packs))
@@ -111,7 +104,6 @@ namespace ElsEvo
             }
         }
 
-        /// <summary>Lista "Nenhum" + todos os packs (na pasta packs\) que contêm esse arquivo específico.</summary>
         private List<string> ObterPacksParaArquivo(string nomeArquivo, string? garantirIncluido = null)
         {
             var opcoes = new List<string> { "Nenhum" };
@@ -133,14 +125,12 @@ namespace ElsEvo
             return opcoes;
         }
 
-        /// <summary>Recalcula as opções de cada linha (chame depois de importar/excluir um pack).</summary>
         private void AtualizarOpcoesDeTodasAsLinhas()
         {
             foreach (var mod in _todosOsMods)
                 mod.OpcoesDisponiveis = ObterPacksParaArquivo(mod.Arquivo, mod.ModSelecionado);
         }
 
-        /// <summary>Combo global lista "Desabilitar todos" + cada pack individual (pra habilitar um pack específico).</summary>
         private void AtualizarComboGlobal()
         {
             CmbAcaoGlobal.Items.Clear();
@@ -358,13 +348,6 @@ namespace ElsEvo
             ProgressoImportacaoContainer.Visibility = Visibility.Collapsed;
         }
 
-        /// <summary>
-        /// Exclui o pack escolhido. Prioridade: se o combo global do topo tiver um pack
-        /// específico selecionado (diferente de "Desabilitar todos"), usa ele. Só cai pra
-        /// linha selecionada na grid se o combo do topo não tiver nada de específico
-        /// escolhido — assim o combo do topo (mais visível, no cabeçalho da janela)
-        /// sempre "ganha" quando os dois estão preenchidos ao mesmo tempo.
-        /// </summary>
         private void MenuExcluirPackSelecionado_Click(object sender, RoutedEventArgs e)
         {
             PopupMenu.IsOpen = false;
@@ -418,10 +401,6 @@ namespace ElsEvo
             }
         }
 
-        /// <summary>
-        /// "Desabilitar todos" zera tudo. Selecionar um PACK específico habilita esse pack
-        /// em todas as linhas onde ele está disponível, sem mexer nas linhas dos outros packs.
-        /// </summary>
         private void BtnAplicarAcaoGlobal_Click(object sender, RoutedEventArgs e)
         {
             string? selecionado = CmbAcaoGlobal.SelectedItem as string;
@@ -457,11 +436,6 @@ namespace ElsEvo
 
         private void BtnAplicar_Click(object sender, RoutedEventArgs e) => SalvarConfiguracaoDeMods();
 
-        /// <summary>
-        /// Salva só os mods com pack selecionado. O caminho é SEMPRE recalculado a partir do
-        /// pack atualmente escolhido (não confia em CaminhoCompleto antigo), porque um mesmo
-        /// arquivo pode estar disponível em vários packs e o usuário pode trocar de pack.
-        /// </summary>
         private void SalvarConfiguracaoDeMods()
         {
             var ativos = _todosOsMods
@@ -482,7 +456,7 @@ namespace ElsEvo
                 .ToList();
 
             GerenciadorDeMods.Salvar(ativos);
-            BtnAplicar.IsEnabled = false; // volta a ficar "apagado" até algo mudar de novo
+            BtnAplicar.IsEnabled = false;
         }
     }
 }

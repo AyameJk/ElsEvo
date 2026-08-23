@@ -60,7 +60,6 @@
             </Setter>
         </Style>
 
-        <!-- Toggle LIGADO/DESLIGADO: template 100% próprio, sem chrome nativo do Windows -->
         <Style x:Key="BotaoToggle" TargetType="Button">
             <Setter Property="Cursor" Value="Hand"/>
             <Setter Property="Template">
@@ -74,7 +73,6 @@
             </Setter>
         </Style>
 
-        <!-- ===== Menu escuro de verdade (fundo, hover e submenu) ===== -->
         <Style TargetType="MenuItem">
             <Setter Property="Foreground" Value="{DynamicResource CorTextoPrimario}"/>
             <Setter Property="Background" Value="Transparent"/>
@@ -83,7 +81,7 @@
                 <Setter.Value>
                     <ControlTemplate TargetType="MenuItem">
                         <Grid>
-                            <!-- Item de topo (Ações / Configurações / Sobre) -->
+
                             <Border x:Name="fundoTopo"
                                     Background="{TemplateBinding Background}"
                                     CornerRadius="4"
@@ -104,7 +102,6 @@
                                 </Grid>
                             </Border>
 
-                            <!-- Popup do submenu -->
                             <Popup x:Name="PART_Popup"
                                    Placement="Bottom"
                                    IsOpen="{TemplateBinding IsSubmenuOpen}"
@@ -144,7 +141,6 @@
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
 
-            <!-- ===================== BARRA DE TÍTULO CUSTOM ===================== -->
             <Grid Grid.Row="0"
                   x:Name="BarraTitulo"
                   Height="36"
@@ -184,7 +180,6 @@
 
             </Grid>
 
-            <!-- ===================== CONTEÚDO ===================== -->
             <Grid Grid.Row="1" Margin="16,0,16,16">
 
                 <Grid.RowDefinitions>
@@ -194,7 +189,6 @@
                     <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
 
-                <!-- Badge LIGADO/DESLIGADO (clicável) -->
                 <Grid Grid.Row="0" Margin="0,0,0,12">
                     <Button x:Name="BtnToggleLigado"
                             HorizontalAlignment="Right"
@@ -215,7 +209,6 @@
                     </Button>
                 </Grid>
 
-                <!-- Menu -->
                 <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,0,0,12">
 
                     <Menu Background="Transparent" BorderThickness="0" Margin="0,0,4,0">
@@ -252,7 +245,6 @@
 
                 </StackPanel>
 
-                <!-- Lista -->
                 <Grid Grid.Row="2" Margin="0,0,0,16">
 
                     <Grid.RowDefinitions>
@@ -287,7 +279,6 @@
 
                 </Grid>
 
-                <!-- Botões -->
                 <StackPanel Grid.Row="3">
 
                     <Button x:Name="BtnGerenciarMods"

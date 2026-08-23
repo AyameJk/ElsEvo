@@ -7,7 +7,7 @@ using System.Text.Json.Serialization;
 
 namespace ElsEvo
 {
-    /// <summary>Um arquivo conhecido do jogo (equivalente ao ElswordFile original).</summary>
+
     public class ArquivoConhecido
     {
         [JsonPropertyName("FileName")]
@@ -23,11 +23,6 @@ namespace ElsEvo
         public string BlockedServers { get; set; } = string.Empty;
     }
 
-    /// <summary>
-    /// Réplica do ElswordFilesManager original: um dicionário com a descrição de cada
-    /// arquivo conhecido do jogo (data079.kom -> "[Vozes] Aisha", etc.), extraído do
-    /// recurso real Text.Data_ElswordFileInfo (397 arquivos catalogados).
-    /// </summary>
     public static class BancoDeArquivos
     {
         private static readonly Lazy<Dictionary<string, ArquivoConhecido>> _porNome = new(Carregar);
@@ -37,7 +32,6 @@ namespace ElsEvo
             return _porNome.Value.TryGetValue(nomeArquivo, out var arquivo) ? arquivo : null;
         }
 
-        /// <summary>Categoria (Geral/BGM/Video) baseada só na extensão — igual ao SearchCriterias original.</summary>
         public static CategoriaMod CategoriaPorExtensao(string nomeArquivo)
         {
             string ext = Path.GetExtension(nomeArquivo).ToLowerInvariant();
@@ -45,7 +39,7 @@ namespace ElsEvo
             {
                 ".ogg" => CategoriaMod.BGM,
                 ".avi" => CategoriaMod.Video,
-                _ => CategoriaMod.Geral // .kom, general.ess
+                _ => CategoriaMod.Geral
             };
         }
 

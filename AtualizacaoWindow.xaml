@@ -45,8 +45,6 @@
             </Style.Triggers>
         </Style>
 
-        <!-- ===== Scrollbar fina e arredondada (substitui a scrollbar cinza padrão do
-             Windows, que destoa do resto da interface flat/moderna) ===== -->
         <Style x:Key="PolegarScrollbarModerno" TargetType="Thumb">
             <Setter Property="Template">
                 <Setter.Value>
@@ -95,7 +93,6 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <!-- Cabeçalho: ícone + título + versão -->
         <Grid Grid.Row="0" Margin="0,0,0,12">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
@@ -129,9 +126,6 @@
             </StackPanel>
         </Grid>
 
-        <!-- Notas da release — montadas dinamicamente no code-behind, na MESMA ORDEM
-             em que texto/imagem/citação aparecem no Markdown original (ver PrepararNotas
-             em AtualizacaoWindow.xaml.cs). -->
         <Border Grid.Row="1"
                 x:Name="ContainerNotas"
                 Background="{DynamicResource CorFundoCartao}"
@@ -146,7 +140,6 @@
             </ScrollViewer>
         </Border>
 
-        <!-- Aviso de canal beta (só aparece quando a atualização vem do canal beta) -->
         <Border Grid.Row="2"
                 x:Name="ContainerAvisoBeta"
                 Background="#3D2E1A"
@@ -179,7 +172,6 @@
                    TextWrapping="Wrap"
                    Margin="0,0,0,16"/>
 
-        <!-- Botões -->
         <StackPanel Grid.Row="4" Orientation="Horizontal" HorizontalAlignment="Right">
             <Button x:Name="BtnAgoraNao"
                     Content="Agora não"

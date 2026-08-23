@@ -5,16 +5,7 @@ using System.Linq;
 
 namespace ElsEvo
 {
-    /// <summary>
-    /// Réplica fiel do Paths.cs real do gPatcher (decompilado). Detalhes importantes
-    /// preservados de propósito:
-    ///   - O executável do CLIENTE é "x2.exe" dentro da pasta "data" (não "elsword.exe"!).
-    ///   - "elsword.exe" na raiz é o LAUNCHER.
-    ///   - O cache não fica dentro da pasta do jogo: fica na RAIZ DO DISCO onde o jogo
-    ///     está instalado (ex.: se o jogo está em D:\Jogos\Elsword, o cache é D:\gPatcher cache).
-    ///   - BlockLogs "bloqueia" substituindo os arquivos de log por PASTAS somente-leitura
-    ///     com o mesmo nome (truque pra impedir o jogo de recriar o arquivo).
-    /// </summary>
+
     public static class Paths
     {
         public static class Elsword
@@ -23,10 +14,8 @@ namespace ElsEvo
 
             public static string Data => CriarSeValido(Path.Combine(Root, "data"));
 
-            /// <summary>Executável do CLIENTE (não é o elsword.exe!).</summary>
             public static string ClientExe => Path.Combine(Data, "x2.exe");
 
-            /// <summary>Executável do LAUNCHER, na raiz da instalação.</summary>
             public static string LauncherExe => Path.Combine(Root, "elsword.exe");
 
             public static string Backup => CriarSeValido(Path.Combine(Root, "backup"));
@@ -50,13 +39,12 @@ namespace ElsEvo
                 return File.Exists(exe) && Directory.Exists(dataDir);
             }
 
-            /// <summary>"Bloqueia" os arquivos de log virando pasta oculta/somente-leitura no lugar deles.</summary>
             public static void BlockLogs()
             {
                 foreach (string arquivo in ArquivosDeLog)
                 {
                     if (Directory.Exists(arquivo))
-                        continue; // já bloqueado
+                        continue;
 
                     if (File.Exists(arquivo))
                         File.Delete(arquivo);
@@ -67,7 +55,6 @@ namespace ElsEvo
                 }
             }
 
-            /// <summary>Desfaz o BlockLogs, removendo as pastas-armadilha.</summary>
             public static void UnblockLogs()
             {
                 foreach (string arquivo in ArquivosDeLog)
@@ -80,7 +67,7 @@ namespace ElsEvo
                         var pasta = new DirectoryInfo(arquivo) { Attributes = FileAttributes.Directory };
                         pasta.Delete(recursive: true);
                     }
-                    catch { /* ignora se ainda estiver marcado somente-leitura */ }
+                    catch {  }
                 }
             }
 
@@ -111,13 +98,6 @@ namespace ElsEvo
                 });
             }
 
-            /// <summary>
-            /// Procura o processo do cliente já em execução. Primeiro tenta os nomes
-            /// conhecidos (x2 = DirectX 9, x2_dx11 = DirectX 11 — o launcher deixa escolher),
-            /// que é uma checagem rápida e não esbarra em permissão de anti-cheat. Se não
-            /// achar nenhum dos dois, cai pra busca genérica por qualquer processo rodando
-            /// de dentro da pasta do jogo (cobre outras variações de nome).
-            /// </summary>
             public static Process? GetClientProcess()
             {
                 foreach (var nomeConhecido in new[] { "x2", "x2_dx11" })
@@ -149,8 +129,7 @@ namespace ElsEvo
                         }
                         catch
                         {
-                            // Processo protegido/sem permissão de acesso (comum com anti-cheat
-                            // tipo XIGNCODE3 bloqueando introspecção) — ignora e continua.
+
                         }
                     }
                 }
@@ -171,7 +150,7 @@ namespace ElsEvo
 
         public static class Main
         {
-            /// <summary>Cache fica na RAIZ DO DISCO onde o jogo está instalado, não dentro da pasta do jogo.</summary>
+
             public static string Cache
             {
                 get
@@ -183,12 +162,6 @@ namespace ElsEvo
                 }
             }
 
-            /// <summary>
-            /// Pasta onde ficam os packs de mod importados. Fica DENTRO da própria instalação
-            /// do Elsword (não mais ao lado do .exe do ElsEVO) — assim ela está garantidamente
-            /// no MESMO disco que a pasta "data\" do jogo, e mover arquivos de lá pra cá na
-            /// hora do patch é um MOVE rápido (mesmo volume), não uma cópia lenta entre discos.
-            /// </summary>
             public static string Packs
             {
                 get
@@ -196,7 +169,7 @@ namespace ElsEvo
                     string raiz = Elsword.Root;
                     string caminho = !string.IsNullOrWhiteSpace(raiz) && Directory.Exists(raiz)
                         ? Path.Combine(raiz, "cacheElsEvo")
-                        : Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "cacheElsEvo"); // fallback se o jogo ainda não foi configurado
+                        : Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "cacheElsEvo");
 
                     Directory.CreateDirectory(caminho);
                     MigrarPacksAntigosSeNecessario(caminho);
@@ -204,11 +177,6 @@ namespace ElsEvo
                 }
             }
 
-            /// <summary>
-            /// Versões anteriores do ElsEVO guardavam os packs ao lado do próprio .exe
-            /// (pastas "packs\" ou "cacheElsEvo\" ali). Se isso existir e a pasta nova (dentro
-            /// do jogo) ainda não tiver nada, move automaticamente pra não obrigar reimportar.
-            /// </summary>
             private static void MigrarPacksAntigosSeNecessario(string pastaNova)
             {
                 try
@@ -219,8 +187,6 @@ namespace ElsEvo
                     {
                         string pastaAntiga = Path.Combine(baseDoApp, nomeAntigo);
 
-                        // Nunca migra a própria pasta nova de/pra ela mesma (acontece se o jogo
-                        // estiver instalado dentro da mesma pasta do ElsEVO, caso raro).
                         if (string.Equals(pastaAntiga, pastaNova, StringComparison.OrdinalIgnoreCase))
                             continue;
 
@@ -240,20 +206,17 @@ namespace ElsEvo
                                 Directory.Move(pastaPack, destino);
                         }
 
-                        // Se a pasta antiga ficou vazia depois de mover tudo, remove ela.
                         if (Directory.Exists(pastaAntiga) && !Directory.EnumerateFileSystemEntries(pastaAntiga).Any())
                             Directory.Delete(pastaAntiga);
                     }
                 }
                 catch
                 {
-                    // Falhou a migração automática (permissão, arquivo em uso, etc.) — não é
-                    // crítico, só significa que o usuário precisa reimportar manualmente.
+
                 }
             }
         }
 
-        /// <summary>Onde fica o "usrmods" (equivalente aos mods ativos) — AppData\Local\ElsEvo.</summary>
         public static string LocalApplicationData { get; } =
             Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "ElsEvo");
 

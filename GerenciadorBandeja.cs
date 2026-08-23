@@ -4,10 +4,7 @@ using WinForms = System.Windows.Forms;
 
 namespace ElsEvo
 {
-    /// <summary>
-    /// Ícone na área de notificação (bandeja). Usa System.Windows.Forms.NotifyIcon porque
-    /// o WPF não tem um equivalente nativo — é preciso habilitar UseWindowsForms no .csproj.
-    /// </summary>
+
     public class GerenciadorBandeja : IDisposable
     {
         private readonly WinForms.NotifyIcon _icone;

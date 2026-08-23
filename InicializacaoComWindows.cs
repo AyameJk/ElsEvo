@@ -4,7 +4,7 @@ using Microsoft.Win32;
 
 namespace ElsEvo
 {
-    /// <summary>Ativa/desativa "Iniciar com o Windows" via HKCU\...\Run (não precisa de admin).</summary>
+
     public static class InicializacaoComWindows
     {
         private const string CaminhoChave = @"Software\Microsoft\Windows\CurrentVersion\Run";
@@ -34,7 +34,7 @@ namespace ElsEvo
             }
             catch
             {
-                // Sem permissão ou chave inacessível — falha silenciosa, não é crítico.
+
             }
         }
     }

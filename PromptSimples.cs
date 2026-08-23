@@ -3,10 +3,7 @@ using System.Windows.Controls;
 
 namespace ElsEvo
 {
-    /// <summary>
-    /// Substitui o Microsoft.VisualBasic.Interaction.InputBox (que exigiria uma referência
-    /// extra no projeto) por uma janela mínima feita em código, sem precisar de um novo XAML.
-    /// </summary>
+
     public static class PromptSimples
     {
         public static string? PedirTexto(Window owner, string titulo, string mensagem, string valorInicial = "")

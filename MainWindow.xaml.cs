@@ -20,7 +20,6 @@ namespace ElsEvo
         private CancellationTokenSource? _cancelamentoAtual;
         private GerenciadorBandeja? _bandeja;
 
-        // Bounds guardados antes de "maximizar" (nosso maximize falso, que respeita a barra de tarefas)
         private double _larguraAntesDeMaximizar;
         private double _alturaAntesDeMaximizar;
         private double _topoAntesDeMaximizar;
@@ -33,21 +32,17 @@ namespace ElsEvo
             _modsLigados = Properties.Settings.Default.ModsEnabled;
 
             Idiomas.IdiomaMudou += AplicarIdioma;
-            ThemeManager.TemaMudou += _ => AtualizarVisualToggle(); // reage na hora, mesmo com Configurações ainda aberta
+            ThemeManager.TemaMudou += _ => AtualizarVisualToggle();
 
             Loaded += (_, _) =>
             {
-                ThemeManager.AplicarTemaSalvo(); // reforço: garante que o tema bateu, mesmo que o do App.xaml.cs tenha falhado por algum motivo
+                ThemeManager.AplicarTemaSalvo();
                 AtualizarListaDeModsAtivos();
                 AtualizarVisualToggle();
                 AplicarIdioma();
                 ConfigurarBandeja();
-                BadgeBeta.Visibility = Visibility.Collapsed; // versão estável — badge BETA nunca aparece aqui
+                BadgeBeta.Visibility = Visibility.Collapsed;
 
-                // Se o app acabou de reabrir sozinho por causa de um update (ver
-                // ReabrirAppAtualizadoEFechar, que passa esse argumento), mostra a
-                // confirmação de sucesso em vez de checar atualização de novo — checar de
-                // novo logo em seguida seria redundante (a gente já sabe que atualizou).
                 bool acabouDeAtualizar = Environment.GetCommandLineArgs()
                     .Any(arg => arg.Equals("--atualizado", StringComparison.OrdinalIgnoreCase));
 
@@ -58,8 +53,7 @@ namespace ElsEvo
                 }
                 else
                 {
-                    // Checagem de atualização: roda em segundo plano, sem travar a abertura
-                    // da janela. Se achar uma versão nova, ela mesma cuida de perguntar ao usuário.
+
                     _ = VerificarAtualizacaoAsync();
                 }
             };
@@ -88,8 +82,6 @@ namespace ElsEvo
             }
         }
 
-        // ===================== IDIOMA =====================
-
         private void AplicarIdioma()
         {
             MenuItemAcoes.Header = Idiomas.T("MenuAcoes");
@@ -104,12 +96,8 @@ namespace ElsEvo
             TxtListaVazia.Text = Idiomas.T("ListaVazia");
             StatusBadge.Text = _modsLigados ? Idiomas.T("Ligado") : Idiomas.T("Desligado");
 
-            // Texto do botão principal também depende do idioma — reaplica aqui pra cobrir
-            // o caso de trocar de idioma sem tocar no toggle.
             AtualizarTextoBotaoJogar();
         }
-
-        // ===================== MODS ATIVOS (agrupado por pack) =====================
 
         private void AtualizarListaDeModsAtivos()
         {
@@ -117,7 +105,6 @@ namespace ElsEvo
 
             ListaModsAtivos.Items.Clear();
 
-            // Um item por PACK (não um item por arquivo) — mostra quantos arquivos vêm de cada pack.
             var porPack = ativos.GroupBy(m => m.NomeDoPack);
 
             foreach (var grupo in porPack)
@@ -138,8 +125,6 @@ namespace ElsEvo
             TxtListaVazia.Visibility = temMods ? Visibility.Collapsed : Visibility.Visible;
         }
 
-        // ===================== BARRA DE TÍTULO CUSTOM =====================
-
         private void BarraTitulo_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             if (e.ClickCount == 2)
@@ -154,11 +139,6 @@ namespace ElsEvo
 
         private void BtnMinimizar_Click(object sender, RoutedEventArgs e) => WindowState = WindowState.Minimized;
 
-        /// <summary>
-        /// "Maximiza" manualmente respeitando a área de trabalho (SystemParameters.WorkArea),
-        /// porque com WindowStyle="None" o WindowState.Maximized nativo cobre a tela inteira
-        /// (inclusive por cima da barra de tarefas).
-        /// </summary>
         private void BtnMaximizar_Click(object sender, RoutedEventArgs e)
         {
             if (!_estaMaximizada)
@@ -189,14 +169,12 @@ namespace ElsEvo
 
         private void Window_StateChanged(object? sender, EventArgs e)
         {
-            // Se o usuário restaurar via outro meio (ex.: barra de tarefas), garante estado normal.
+
             if (WindowState == WindowState.Maximized)
                 WindowState = WindowState.Normal;
         }
 
         private void BtnFechar_Click(object sender, RoutedEventArgs e) => Close();
-
-        // ===================== TOGGLE LIGADO/DESLIGADO (ModsEnabled) =====================
 
         private void BtnToggleLigado_Click(object sender, RoutedEventArgs e)
         {
@@ -251,18 +229,10 @@ namespace ElsEvo
             AtualizarTextoBotaoJogar();
         }
 
-        /// <summary>
-        /// Com os mods LIGADOS, o botão principal diz "Aplicar e Jogar" (aplica os mods e
-        /// abre o jogo). Com os mods DESLIGADOS, não tem nada pra "aplicar" de verdade —
-        /// então o botão vira "Executar o Launcher", deixando claro de cara que vai abrir
-        /// o jogo puro, sem precisar de um popup de aviso no meio do caminho.
-        /// </summary>
         private void AtualizarTextoBotaoJogar()
         {
             BtnJogar.Content = _modsLigados ? Idiomas.T("BtnAplicarJogar") : Idiomas.T("BtnExecutarLauncher");
         }
-
-        // ===================== MENU: AÇÕES =====================
 
         private void MenuReiniciar_Click(object sender, RoutedEventArgs e)
         {
@@ -347,15 +317,11 @@ namespace ElsEvo
             }
         }
 
-        // ===================== MENU: CONFIGURAÇÕES / SOBRE =====================
-
         private void MenuConfiguracoes_Click(object sender, RoutedEventArgs e)
         {
             var janela = new PreferenciasWindow { Owner = this };
             janela.ShowDialog();
 
-            // Reaplica tudo que pode ter mudado nas Configurações: tema, idioma,
-            // cor do LIGADO/DESLIGADO. Badge BETA não existe mais nessa versão (estável).
             AtualizarVisualToggle();
             AplicarIdioma();
         }
@@ -373,8 +339,6 @@ namespace ElsEvo
 
             AtualizarListaDeModsAtivos();
         }
-
-        // ===================== APLICAR E JOGAR =====================
 
         private async void BtnJogar_Click(object sender, RoutedEventArgs e)
         {
@@ -397,9 +361,6 @@ namespace ElsEvo
                     .Select(m => new PatchInfo(m))
                     .ToList();
             }
-            // Quando DESLIGADO, listaDePatches fica vazia mesmo — o próprio texto do botão
-            // ("Executar o Launcher") já deixa claro que o jogo vai abrir sem modificações,
-            // então não precisamos mais interromper o fluxo com um popup de aviso aqui.
 
             BtnJogar.IsEnabled = false;
             BtnJogar.Content = "Aguardando o launcher...";
@@ -437,7 +398,7 @@ namespace ElsEvo
             }
             catch (OperationCanceledException)
             {
-                // cancelado pelo usuário
+
             }
             catch (Exception ex)
             {
@@ -453,15 +414,6 @@ namespace ElsEvo
             }
         }
 
-        // ===================== ATUALIZAÇÃO AUTOMÁTICA =====================
-
-        /// <summary>
-        /// Roda no Loaded da janela (se "Buscar atualizações ao iniciar" estiver marcado).
-        /// Checa o version.json remoto (respeitando o canal estável/beta escolhido) e, se
-        /// achar uma versão mais nova, pergunta ao usuário se quer baixar e instalar agora.
-        /// Qualquer falha na CHECAGEM em si é sempre silenciosa (ver AtualizacaoService) —
-        /// não faz sentido incomodar o usuário toda vez que abrir o app sem internet.
-        /// </summary>
         private async Task VerificarAtualizacaoAsync()
         {
             if (!Properties.Settings.Default.CheckForProgramUpdates)
@@ -471,8 +423,6 @@ namespace ElsEvo
             if (atualizacao == null)
                 return;
 
-            // Janela customizada seguindo o tema do app, em vez do MessageBox nativo do
-            // Windows — ver AtualizacaoWindow.xaml. DialogResult == true = "atualizar agora".
             var janela = new AtualizacaoWindow(atualizacao) { Owner = this };
             bool? resposta = janela.ShowDialog();
 
@@ -482,25 +432,10 @@ namespace ElsEvo
             await BaixarEInstalarAtualizacaoAsync(atualizacao);
         }
 
-        /// <summary>
-        /// Baixa o instalador (.exe do Inno Setup) pra uma pasta temporária, mostrando
-        /// progresso na mesma barra usada pelo "Aplicar e Jogar". Ao terminar, roda o
-        /// instalador em modo SILENCIOSO (sem assistente visível, sem exigir clique
-        /// nenhum do usuário), espera ele terminar de verdade, e então reabre o ElsEvo
-        /// sozinho já na versão nova. Erros de rede durante o download OU falha no
-        /// instalador silencioso são tratados sem deixar o usuário no escuro: mostra um
-        /// aviso visível (já que sem assistente ele não veria nada acontecer sozinho).
-        /// </summary>
         private async Task BaixarEInstalarAtualizacaoAsync(AtualizacaoDisponivel atualizacao)
         {
             string caminhoInstalador = Path.Combine(Path.GetTempPath(), "ElsEvo-Setup.exe");
 
-            // Bloqueia as ações principais enquanto a atualização roda — o usuário não
-            // pode clicar em "Aplicar e Jogar" (ou abrir "Gerenciar Mods") no meio do
-            // download/instalação, pra não arriscar mexer em arquivos ao mesmo tempo que
-            // o instalador. Reabilitado no finally, cobrindo TODO caminho de saída
-            // (sucesso, erro de rede, erro do instalador) — só não reabilita se o app já
-            // tiver sido fechado com sucesso (Application.Current.Shutdown()).
             BtnJogar.IsEnabled = false;
             BtnGerenciarMods.IsEnabled = false;
             bool appVaiFecharComSucesso = false;
@@ -555,12 +490,6 @@ namespace ElsEvo
                 if (!baixouComSucesso)
                     return;
 
-                // A partir daqui a barra continua visível, agora mostrando "Instalando..." —
-                // o usuário não interage com o instalador (roda sem assistente), então esse
-                // texto na própria janela do ElsEvo é o único feedback visual que ele tem.
-                // Como o Inno Setup silencioso não reporta progresso real de volta, a barra
-                // fica travada em 100% — pra não parecer que travou/quebrou, os pontinhos no
-                // final do texto animam sozinhos enquanto espera (só isso muda, a barra não).
                 BarraProgresso.Value = 100;
 
                 var timerPontinhos = new System.Windows.Threading.DispatcherTimer
@@ -578,19 +507,7 @@ namespace ElsEvo
                 int codigoSaida;
                 try
                 {
-                    // /VERYSILENT: instala sem NENHUMA janela do assistente (nem barra de
-                    // progresso própria do Inno Setup — por isso mostramos a nossa).
-                    // /SUPPRESSMSGBOXES: qualquer caixa de diálogo do instalador (avisos,
-                    // confirmações) é respondida automaticamente com a opção padrão, sem
-                    // travar esperando clique.
-                    // /NORESTART: nunca reinicia o Windows sozinho, mesmo que ache necessário.
-                    // /SP-: pula a telinha inicial (irrelevante em modo silencioso, mas
-                    // mantido por consistência com o fluxo anterior).
-                    //
-                    // ATENÇÃO: como o destino padrão é Program Files, o Windows exige
-                    // elevação — o UAC ("Deseja permitir que este app faça alterações no
-                    // dispositivo?") ainda aparece mesmo com /VERYSILENT, isso é decisão
-                    // do Windows, não do instalador, e não dá pra suprimir por código.
+
                     var processoInstalador = Process.Start(new ProcessStartInfo
                     {
                         FileName = caminhoInstalador,
@@ -601,8 +518,6 @@ namespace ElsEvo
                     if (processoInstalador == null)
                         throw new InvalidOperationException("Não foi possível iniciar o processo do instalador.");
 
-                    // Espera o instalador terminar DE VERDADE antes de continuar — sem isso o
-                    // app fecharia ou tentaria reabrir antes dos arquivos serem substituídos.
                     await Task.Run(() => processoInstalador.WaitForExit());
                     codigoSaida = processoInstalador.ExitCode;
                 }
@@ -618,10 +533,6 @@ namespace ElsEvo
 
                 timerPontinhos.Stop();
 
-                // Código de saída do Inno Setup: 0 = sucesso. Qualquer outro valor indica que
-                // algo deu errado (ex.: 5 = falha na instalação, 6 = cancelado pelo Restart
-                // Manager) — como não tem assistente visível, o usuário não veria isso sozinho,
-                // então mostramos um aviso explícito em vez de simplesmente reabrir o app.
                 if (codigoSaida != 0)
                 {
                     MessageBox.Show(
@@ -632,9 +543,6 @@ namespace ElsEvo
                         "Atenção — instalação da atualização", MessageBoxButton.OK, MessageBoxImage.Warning);
                 }
 
-                // A partir daqui o app vai fechar de propósito (ReabrirAppAtualizadoEFechar
-                // chama Application.Current.Shutdown() no final) — não faz sentido reabilitar
-                // os botões nesse caminho, a janela já não vai mais existir.
                 appVaiFecharComSucesso = true;
                 ReabrirAppAtualizadoEFechar();
             }
@@ -649,27 +557,12 @@ namespace ElsEvo
             }
         }
 
-        /// <summary>
-        /// Reabre o ElsEvo sozinho (já na versão instalada pelo update) e fecha esta
-        /// instância antiga em seguida — o usuário não precisa clicar em nada. O caminho
-        /// do .exe pós-instalação é lido do registro do Windows (chave de desinstalação
-        /// criada pelo Inno Setup, identificada pelo AppId fixo do ElsEvo.iss), porque é
-        /// a forma confiável de saber onde ficou instalado — não assume que é a mesma
-        /// pasta do processo atual (o usuário pode ter mudado o destino da instalação).
-        /// Se não achar no registro por qualquer motivo, cai pro caminho do processo
-        /// atual como último recurso.
-        /// </summary>
         private void ReabrirAppAtualizadoEFechar()
         {
             string? caminhoRegistro = ObterCaminhoExeInstalado();
             string? caminhoProcessoAtual = Process.GetCurrentProcess().MainModule?.FileName;
             string? caminhoExeNovo = caminhoRegistro ?? caminhoProcessoAtual;
 
-            // Log de diagnóstico temporário — grava em %LocalAppData%\ElsEvo\update-log.txt
-            // exatamente o que essa etapa encontrou/fez, porque a janela de erro (se
-            // aparecer) pode passar rápido demais na tela durante o fechamento do app.
-            // Não precisa de nenhuma configuração pra funcionar; se a escrita falhar por
-            // qualquer motivo, ignora silenciosamente (não é crítico pro fluxo em si).
             void Log(string linha)
             {
                 try
@@ -726,13 +619,6 @@ namespace ElsEvo
             }
         }
 
-        /// <summary>
-        /// Lê a pasta de instalação real do ElsEvo a partir da chave de desinstalação que
-        /// o Inno Setup cria no registro (identificada pelo AppId fixo definido no
-        /// ElsEvo.iss — {8910440C-BF7A-494D-B5AD-7F0A4DA85D60}). Checa tanto a visão de
-        /// 64 bits quanto a WOW6432Node (32 bits), e HKLM antes de HKCU, cobrindo tanto
-        /// instalação padrão (todos os usuários) quanto "somente usuário atual".
-        /// </summary>
         private static string? ObterCaminhoExeInstalado()
         {
             const string chaveAppId = @"{8910440C-BF7A-494D-B5AD-7F0A4DA85D60}_is1";
@@ -760,7 +646,7 @@ namespace ElsEvo
                     }
                     catch
                     {
-                        // Chave inacessível ou inexistente nessa combinação — tenta a próxima.
+
                     }
                 }
             }

@@ -8,25 +8,17 @@ namespace ElsEvo
 {
     public partial class PreferenciasWindow : Window
     {
-        // Começa TRUE de propósito: o valor padrão do XAML (SelectedIndex="0" no idioma,
-        // IsChecked="True" no tema Escuro) dispara os eventos de mudança durante o
-        // InitializeComponent(), ANTES da gente ler a configuração salva de verdade.
-        // Sem isso, abrir a janela já sobrescrevia o idioma/tema salvos.
+
         private bool _carregando = true;
 
-        // Texto de exemplo do campo de argumentos (usado como PLACEHOLDER de verdade agora:
-        // aparece cinza quando o campo está vazio e sem foco, e some completamente assim
-        // que o usuário clica pra digitar — não precisa mais apagar nada na mão).
         private const string PlaceholderArgumentos = "argumentos | ex: 8f9slxa02nkp29ak1u26mqpcms";
 
-        // Liga enquanto o próprio código está trocando o texto do placeholder (focar/desfocar),
-        // pra não marcar "Aplicar" como pendente só por causa disso.
         private bool _ajustandoPlaceholder;
 
         public PreferenciasWindow()
         {
             InitializeComponent();
-            ThemeManager.AplicarTemaSalvo(); // reforço de segurança
+            ThemeManager.AplicarTemaSalvo();
             CarregarConfiguracoes();
             AplicarIdioma();
             _carregando = false;
@@ -40,11 +32,6 @@ namespace ElsEvo
             TxtArgumentos.LostFocus += TxtArgumentos_LostFocus;
         }
 
-        /// <summary>
-        /// "Aplicar" começa desabilitado (nada mudou ainda) e só liga de novo quando o
-        /// usuário mexe em algum campo — igual o comportamento padrão de configurações do
-        /// Windows. Depois de salvar, desabilita de novo (permanece assim até nova mudança).
-        /// </summary>
         private void ConectarDeteccaoDeAlteracoes()
         {
             void Marcar(object? sender, EventArgs e)
@@ -123,8 +110,6 @@ namespace ElsEvo
             ChkPularElsword.IsChecked = cfg.SkipLauncher;
             TxtArgumentos.IsEnabled = cfg.SkipLauncher;
 
-            // Placeholder de verdade: só mostra o texto de exemplo (cinza) quando não há
-            // argumento salvo. Ao focar o campo, ele já some sozinho — ver TxtArgumentos_GotFocus.
             _ajustandoPlaceholder = true;
             if (string.IsNullOrWhiteSpace(cfg.X2Args))
             {
@@ -179,7 +164,6 @@ namespace ElsEvo
             TxtArgumentos.IsEnabled = ChkPularElsword.IsChecked == true;
         }
 
-        /// <summary>Deixa o texto do campo mais apagado quando é só o placeholder de exemplo.</summary>
         private void AtualizarAparenciaPlaceholder(bool temCaminhoReal)
         {
             TxtLocalizacaoJogo.Foreground = temCaminhoReal
@@ -187,10 +171,6 @@ namespace ElsEvo
                 : (System.Windows.Media.Brush)FindResource("CorTextoSecundario");
         }
 
-        /// <summary>
-        /// Ao focar o campo de argumentos: se estiver mostrando só o texto de exemplo,
-        /// some com ele (não precisa mais selecionar tudo e apagar na mão).
-        /// </summary>
         private void TxtArgumentos_GotFocus(object sender, RoutedEventArgs e)
         {
             if (TxtArgumentos.Text == PlaceholderArgumentos)
@@ -202,10 +182,6 @@ namespace ElsEvo
             }
         }
 
-        /// <summary>
-        /// Ao sair do campo: se o usuário não digitou nada, volta a mostrar o texto de
-        /// exemplo (cinza), igual estava antes de focar.
-        /// </summary>
         private void TxtArgumentos_LostFocus(object sender, RoutedEventArgs e)
         {
             if (string.IsNullOrWhiteSpace(TxtArgumentos.Text))
@@ -219,14 +195,12 @@ namespace ElsEvo
 
         private void RadioTema_Checked(object sender, RoutedEventArgs e)
         {
-            // Só guarda a escolha visualmente — o tema de verdade só aplica quando
-            // clicar em "Aplicar" ou "OK" (ver SalvarConfiguracoes).
+
         }
 
         private void CmbIdioma_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            // Só guarda a escolha visualmente por enquanto — o idioma de verdade só troca
-            // quando clicar em "Aplicar" ou "OK" (igual o tema).
+
         }
 
         private void SalvarConfiguracoes()
@@ -245,8 +219,6 @@ namespace ElsEvo
             cfg.TemaClaro = RadioTemaClaro.IsChecked == true;
             cfg.IgnoreBetaReleases = ChkBetaApenas.IsChecked != true;
             cfg.CheckForProgramUpdates = ChkBuscarAtualizacoes.IsChecked == true;
-            // IsBetaRelease não é mais editável pelo usuário — fica fixo enquanto o
-            // ElsEVO estiver mesmo em fase beta (ver Properties/Settings.cs).
 
             cfg.MinimizarParaBandeja = ChkMinimizarBandeja.IsChecked == true;
             cfg.StartHidden = ChkIniciarMinimizado.IsChecked == true;
@@ -264,13 +236,12 @@ namespace ElsEvo
 
             cfg.Save();
 
-            // Tema e idioma só são aplicados de fato aqui (não em tempo real ao interagir).
             ThemeManager.AplicarTema(cfg.TemaClaro);
             BarraTituloNativa.AplicarTema(this, !cfg.TemaClaro);
-            Idiomas.DefinirIdioma(codigoIdioma); // já salva de novo e dispara o evento pras janelas abertas
-            AplicarIdioma(); // atualiza esta própria janela também
+            Idiomas.DefinirIdioma(codigoIdioma);
+            AplicarIdioma();
 
-            BtnAplicar.IsEnabled = false; // volta a ficar "apagado" até algo mudar de novo
+            BtnAplicar.IsEnabled = false;
         }
 
         private void BtnOk_Click(object sender, RoutedEventArgs e)

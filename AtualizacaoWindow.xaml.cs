@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Net;
 using System.Net.Http;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -9,36 +10,28 @@ using System.Windows.Media.Imaging;
 
 namespace ElsEvo
 {
-    /// <summary>
-    /// Substitui o MessageBox nativo do fluxo "uma atualização está disponível" por uma
-    /// janela que segue o tema Claro/Escuro do app (mesmos DynamicResource usados no
-    /// resto da interface — CorFundoPrincipal, CorBotaoFlat, etc., ver ThemeManager.cs).
-    /// DialogResult == true significa "o usuário quer atualizar agora".
-    ///
-    /// As notas de lançamento vêm em Markdown/HTML puro do GitHub Releases (podem ter uma
-    /// tag &lt;img&gt; de capa e uma linha de citação em "&gt; texto"), em QUALQUER ordem
-    /// dentro do texto. Como o TextBlock não renderiza Markdown/HTML, essa janela monta o
-    /// conteúdo dinamicamente em PainelNotas, elemento por elemento, respeitando a MESMA
-    /// ORDEM em que cada trecho aparece no texto original — texto vira TextBlock normal,
-    /// &lt;img&gt; vira uma imagem de verdade baixada da URL, e "&gt; texto" vira um bloco
-    /// de citação destacado. Qualquer coisa que não seja reconhecida simplesmente não
-    /// aparece destacada — nunca quebra a janela.
-    /// </summary>
+
     public partial class AtualizacaoWindow : Window
     {
-        // Casa <img ... src="URL" ...> OU uma linha "> texto" (citação) — o que vier
-        // primeiro no texto processa primeiro, preservando a ordem original.
+
         private static readonly Regex RegexElementoEspecial = new(
             @"<img[^>]*\ssrc=[""'](?<urlImagem>[^""']+)[""'][^>]*/?>" +
-            @"|^\s*>\s*(?<citacao>.+)$",
-            RegexOptions.IgnoreCase | RegexOptions.Multiline);
+            @"|<blockquote[^>]*>(?<citacaoHtml>.*?)</blockquote>" +
+            @"|^[ \t]*>[ \t]*(?<citacao>.+)$" +
+            @"|<h[1-6][^>]*>(?<tituloHtml>.*?)</h[1-6]>" +
+            @"|^[ \t]*#{1,6}[ \t]+(?<tituloMd>.+)$",
+            RegexOptions.IgnoreCase | RegexOptions.Multiline | RegexOptions.Singleline);
+
+        private static readonly Regex RegexTagsEmbrulho = new(
+            @"</?p[^>]*>|</?div[^>]*>|<br\s*/?>",
+            RegexOptions.IgnoreCase);
 
         private static readonly HttpClient _http = new() { Timeout = TimeSpan.FromSeconds(15) };
 
         public AtualizacaoWindow(AtualizacaoDisponivel atualizacao)
         {
             InitializeComponent();
-            ThemeManager.AplicarTemaSalvo(); // reforço de segurança, igual as outras janelas
+            ThemeManager.AplicarTemaSalvo();
 
             SourceInitialized += (_, _) =>
                 BarraTituloNativa.AplicarTema(this, !Properties.Settings.Default.TemaClaro);
@@ -51,8 +44,6 @@ namespace ElsEvo
             PrepararNotas(atualizacao.Notas);
         }
 
-        /// <summary>Aplica as strings traduzidas nos elementos fixos da janela (não nas notas
-        /// da release, que vêm do GitHub no idioma que foi escrito e não são traduzidas).</summary>
         private void AplicarIdioma()
         {
             Title = Idiomas.T("AtualizacaoTitulo");
@@ -63,11 +54,6 @@ namespace ElsEvo
             BtnAtualizar.Content = Idiomas.T("AtualizacaoBtnAtualizar");
         }
 
-        /// <summary>
-        /// Percorre as notas em ordem, transformando cada trecho de texto normal, cada
-        /// &lt;img&gt; e cada linha de citação num elemento visual, na mesma sequência em
-        /// que aparecem no Markdown original — sem reordenar nada.
-        /// </summary>
         private void PrepararNotas(string notasBrutas)
         {
             string texto = notasBrutas ?? string.Empty;
@@ -85,7 +71,7 @@ namespace ElsEvo
 
             foreach (Match match in matches)
             {
-                // Texto normal ANTES desse elemento especial, na ordem em que aparece.
+
                 if (match.Index > posicaoAtual)
                 {
                     string trecho = texto.Substring(posicaoAtual, match.Index - posicaoAtual);
@@ -104,11 +90,27 @@ namespace ElsEvo
                     AdicionarCitacao(citacao);
                     adicionouAlgumElemento = true;
                 }
+                else if (match.Groups["citacaoHtml"].Success)
+                {
+
+                    string citacao = LimparHtmlInterno(match.Groups["citacaoHtml"].Value).Trim('"', '“', '”');
+                    AdicionarCitacao(citacao);
+                    adicionouAlgumElemento = true;
+                }
+                else if (match.Groups["tituloMd"].Success)
+                {
+                    AdicionarTitulo(match.Groups["tituloMd"].Value.Trim());
+                    adicionouAlgumElemento = true;
+                }
+                else if (match.Groups["tituloHtml"].Success)
+                {
+                    AdicionarTitulo(LimparHtmlInterno(match.Groups["tituloHtml"].Value));
+                    adicionouAlgumElemento = true;
+                }
 
                 posicaoAtual = match.Index + match.Length;
             }
 
-            // Texto normal depois do último elemento especial encontrado.
             if (posicaoAtual < texto.Length)
             {
                 string trechoFinal = texto.Substring(posicaoAtual);
@@ -120,16 +122,23 @@ namespace ElsEvo
                 AdicionarTexto(Idiomas.T("AtualizacaoSemNotas"));
         }
 
-        /// <summary>Adiciona um trecho de texto normal (se não for só espaço em branco).</summary>
+        private static string LimparHtmlInterno(string html)
+        {
+            string semTags = Regex.Replace(html ?? string.Empty, @"<[^>]+>", " ");
+            semTags = WebUtility.HtmlDecode(semTags);
+            return Regex.Replace(semTags, @"\s+", " ").Trim();
+        }
+
         private bool AdicionarTexto(string trecho)
         {
-            string limpo = Regex.Replace(trecho, @"(\r?\n){3,}", "\n\n").Trim();
+            string semEmbrulho = RegexTagsEmbrulho.Replace(trecho, string.Empty);
+            string limpo = Regex.Replace(semEmbrulho, @"(\r?\n){3,}", "\n\n").Trim();
             if (string.IsNullOrWhiteSpace(limpo))
                 return false;
 
             PainelNotas.Children.Add(new TextBlock
             {
-                Text = limpo,
+                Text = WebUtility.HtmlDecode(limpo),
                 Foreground = (System.Windows.Media.Brush)FindResource("CorTextoSecundario"),
                 FontSize = 12,
                 TextWrapping = TextWrapping.Wrap,
@@ -139,7 +148,6 @@ namespace ElsEvo
             return true;
         }
 
-        /// <summary>Adiciona o espaço reservado da imagem e dispara o download em segundo plano.</summary>
         private void AdicionarImagem(string url)
         {
             var imagem = new Image
@@ -164,7 +172,6 @@ namespace ElsEvo
                 _ = CarregarImagemAsync(url, imagem, container);
         }
 
-        /// <summary>Adiciona a citação já destacada (barrinha lateral + itálico), sem o "&gt;" cru.</summary>
         private void AdicionarCitacao(string citacao)
         {
             if (string.IsNullOrWhiteSpace(citacao))
@@ -189,11 +196,22 @@ namespace ElsEvo
             PainelNotas.Children.Add(container);
         }
 
-        /// <summary>
-        /// Baixa a imagem em segundo plano e mostra ela de verdade no lugar reservado.
-        /// Se falhar por qualquer motivo (sem internet, URL inválida, etc.), o espaço
-        /// reservado simplesmente continua invisível — nunca trava nem quebra a janela.
-        /// </summary>
+        private void AdicionarTitulo(string titulo)
+        {
+            if (string.IsNullOrWhiteSpace(titulo))
+                return;
+
+            PainelNotas.Children.Add(new TextBlock
+            {
+                Text = WebUtility.HtmlDecode(titulo),
+                Foreground = (System.Windows.Media.Brush)FindResource("CorTextoPrimario"),
+                FontSize = 14,
+                FontWeight = System.Windows.FontWeights.Bold,
+                TextWrapping = TextWrapping.Wrap,
+                Margin = new Thickness(0, 0, 0, 8)
+            });
+        }
+
         private async Task CarregarImagemAsync(string url, Image imagem, Border container)
         {
             try
@@ -215,7 +233,7 @@ namespace ElsEvo
             }
             catch
             {
-                // Sem imagem — a janela continua funcionando normalmente sem ela.
+
             }
         }
 

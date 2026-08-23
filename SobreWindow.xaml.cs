@@ -7,26 +7,21 @@ namespace ElsEvo
         public SobreWindow()
         {
             InitializeComponent();
-            ThemeManager.AplicarTemaSalvo(); // reforço de segurança
+            ThemeManager.AplicarTemaSalvo();
 
             SourceInitialized += (_, _) =>
                 BarraTituloNativa.AplicarTema(this, !Properties.Settings.Default.TemaClaro);
 
             ThemeManager.TemaMudou += AoTemaMudar;
-            Closed += (_, _) => ThemeManager.TemaMudou -= AoTemaMudar; // evita vazamento de memória
+            Closed += (_, _) => ThemeManager.TemaMudou -= AoTemaMudar;
 
             AplicarIdioma();
 
-            // Versão estável: sem badge BETA. O título grande (TxtVersao) continua
-            // mostrando o número curto (AppVersion.Numero, ex.: "1.0"), mas aqui embaixo
-            // mostramos o número COMPLETO com patch (AppVersion.VersaoParaAtualizacao,
-            // ex.: "1.0.1"), pra quem quiser conferir a build exata instalada.
             BadgeBeta.Visibility = Visibility.Collapsed;
             TxtVersaoBeta.Text = string.Format(Idiomas.T("SobreVersaoEstavel"), AppVersion.VersaoParaAtualizacao);
             TxtVersaoBeta.Visibility = Visibility.Visible;
         }
 
-        /// <summary>Roda toda vez que o tema muda enquanto esta janela está aberta.</summary>
         private void AoTemaMudar(bool temaClaro)
         {
             BarraTituloNativa.AplicarTema(this, !temaClaro);

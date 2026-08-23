@@ -4,16 +4,10 @@ using System.Windows.Media;
 
 namespace ElsEvo
 {
-    /// <summary>
-    /// Aplica o tema Claro/Escuro em tempo real, trocando os brushes registrados em
-    /// Application.Current.Resources. As janelas usam DynamicResource pras cores-chave,
-    /// então mudam sozinhas assim que isso roda — sem precisar reabrir a janela.
-    /// </summary>
+
     public static class ThemeManager
     {
-        /// <summary>Disparado toda vez que o tema é aplicado — janelas abertas podem se
-        /// inscrever pra reagir na hora (ex.: recolorir badges, escurecer barra de título
-        /// nativa), em vez de só atualizar quando forem reabertas.</summary>
+
         public static event Action<bool>? TemaMudou;
 
         public static void AplicarTema(bool temaClaro)
@@ -49,7 +43,6 @@ namespace ElsEvo
         private static SolidColorBrush Cor(string hex) =>
             new((Color)ColorConverter.ConvertFromString(hex));
 
-        /// <summary>Chama isso uma vez no início do app (App.xaml.cs) pra já sair no tema salvo.</summary>
         public static void AplicarTemaSalvo()
         {
             AplicarTema(Properties.Settings.Default.TemaClaro);

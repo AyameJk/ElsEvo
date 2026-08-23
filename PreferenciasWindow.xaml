@@ -112,7 +112,6 @@
 
         <TabControl Grid.Row="0" Background="Transparent" BorderThickness="0">
 
-            <!-- ===================== ABA ELSWORD ===================== -->
             <TabItem x:Name="AbaElsword" Header="Elsword">
                 <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="0,12,0,0">
                 <StackPanel>
@@ -203,7 +202,6 @@
                 </ScrollViewer>
             </TabItem>
 
-            <!-- ===================== ABA INICIALIZADOR ===================== -->
             <TabItem x:Name="AbaInicializador" Header="Inicializador">
                 <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="0,12,0,0">
                 <StackPanel>

@@ -1,53 +1,14 @@
 name: Compilar e Publicar Instalador
 
-# ATENÇÃO: este workflow deve existir SOMENTE no repositório ElsEvo (canal estável).
-# Não copiar para o ElsEvoBeta.
-#
-# Este workflow SUBSTITUI o atualizar-versao.yml antigo -- as duas etapas (gerar o
-# instalador e atualizar o version.json) agora rodam em SEQUÊNCIA GARANTIDA dentro do
-# mesmo job, evitando o problema de o version.json apontar pra uma URL de instalador
-# que ainda não existe (race condition entre dois workflows separados escutando o
-# mesmo evento "release: published").
-#
-# Dispara em duas situações:
-#   1) push na main -> só compila, pra pegar erro cedo (não gera instalador nem publica nada)
-#   2) publicação de uma Release -> compila, gera o instalador, anexa na Release,
-#      e SÓ DEPOIS disso atualiza o version.json
-#
-# A versão usada em TUDO (csproj, AppVersion.cs, .iss, version.json) vem da tag da
-# Release (ex: v1.0.5 -> 1.0.5). Você não edita nada de versão manualmente nunca mais,
-# só cria a tag/Release certa no GitHub.
-#
-# IMPORTANTE: se este workflow estiver ativo, DESATIVE ou APAGUE o antigo
-# .github/workflows/atualizar-versao.yml -- os dois rodando juntos no mesmo evento
-# fariam o version.json ser escrito duas vezes (uma delas cedo demais).
-#
-# IMPORTANTE (runner é Windows): o shell PADRÃO em jobs "windows-latest" é o
-# PowerShell, não o Bash -- qualquer "run:" com sintaxe Bash (heredoc "<<'EOF'",
-# "if...then...fi", etc.) precisa declarar "shell: bash" explicitamente, senão o
-# PowerShell tenta interpretar aquilo como PowerShell e quebra com ParserError.
-# As etapas que usam Python via heredoc e o commit/push do version.json (que usa
-# "if git diff --cached --quiet; then ... fi") são exatamente esse caso -- ambas
-# têm "shell: bash" abaixo por causa disso.
-#
-# CORREÇÃO (autocrlf): o actions/checkout no Windows por padrão baixa os arquivos
-# convertendo LF -> CRLF (core.autocrlf=true é o default do Git for Windows nos
-# runners da GitHub). Isso inclui ESTE PRÓPRIO ARQUIVO .yml -- e o heredoc Bash
-# "<<'PYEOF' ... PYEOF" é sensível a isso: se a linha final "PYEOF" for lida como
-# "PYEOF\r" (por causa do CRLF), o bash não reconhece o marcador de fim do heredoc
-# e quebra com erro de redirecionamento/parsing. O primeiro step abaixo desativa
-# essa conversão ANTES do checkout baixar qualquer arquivo, resolvendo a causa raiz
-# sem precisar reescrever a lógica em Python/heredoc que já funciona.
-
 on:
   push:
     branches: [main]
   release:
     types: [published]
-  workflow_dispatch: # permite rodar manualmente pela aba Actions, se precisar
+  workflow_dispatch:
 
 permissions:
-  contents: write # necessário pra anexar o instalador na Release e fazer push do version.json
+  contents: write
 
 env:
   DOTNET_VERSION: '8.0.x'
@@ -59,7 +20,6 @@ jobs:
     runs-on: windows-latest
 
     steps:
-      # Precisa rodar ANTES do checkout, senão os arquivos já baixam com CRLF.
       - name: Desativar conversão CRLF do Git (evita heredoc bash quebrado no Windows)
         run: git config --global core.autocrlf false
         shell: bash
@@ -67,15 +27,13 @@ jobs:
       - name: Baixar código do repositório
         uses: actions/checkout@v4
         with:
-          ref: main # garante que estamos sempre commitando/lendo a partir da main
+          ref: main
 
       - name: Configurar .NET 8
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: ${{ env.DOTNET_VERSION }}
 
-      # Só existe uma versão real quando o gatilho foi uma Release publicada.
-      # Em push comum na main, usamos um valor fixo de rascunho só pra compilar.
       - name: Determinar versão
         id: versao
         shell: pwsh
@@ -89,8 +47,6 @@ jobs:
           Write-Host "Versão resolvida: $versao"
           echo "versao=$versao" >> $env:GITHUB_OUTPUT
 
-      # Só sobrescreve a constante se a versão for uma release de verdade (X.Y.Z),
-      # não a build de rascunho de push comum na main.
       - name: Sincronizar versão em AppVersion.cs
         if: github.event_name == 'release'
         shell: pwsh
@@ -105,9 +61,6 @@ jobs:
       - name: Restaurar dependências
         run: dotnet restore ${{ env.PROJECT_FILE }}
 
-      # dotnet publish, não dotnet build -- precisa gerar o self-contained
-      # single-file exatamente como no comando que você já roda localmente,
-      # senão a pasta de saída não bate com o que o .iss espera.
       - name: Publicar (self-contained, single-file)
         run: >
           dotnet publish ${{ env.PROJECT_FILE }}
@@ -132,28 +85,6 @@ jobs:
         if: github.event_name == 'release'
         run: choco install innosetup -y
 
-      # O pacote do choco só traz os idiomas OFICIAIS do Inno Setup (inclui
-      # BrazilianPortuguese e Spanish, por exemplo). Japanese.isl EXISTE no
-      # repositório oficial do Inno Setup, mas não vem empacotado no instalador do
-      # choco -- só quando você usa o instalador completo do site oficial e marca a
-      # opção de baixar idiomas extras. É por isso que funciona na sua máquina local
-      # mas falha aqui. Baixamos o arquivo que falta direto do repositório oficial e
-      # colocamos na mesma pasta Languages\ (mesmo lugar onde os oficiais já estão),
-      # sem precisar mudar nada no .iss.
-      #
-      # NOTA: Chinês Simplificado foi removido da lista de idiomas do [Languages] do
-      # .iss (dava problema no CI) -- então não baixamos ChineseSimplified.isl aqui,
-      # só o que o .iss realmente usa.
-      #
-      # HISTÓRICO DE TENTATIVAS ERRADAS DE URL (pra não repetir o mesmo erro no futuro):
-      #   1) "https://githubusercontent.com" -- incompleta, só o domínio, sem caminho
-      #      nenhum. Dava "no data of the requested type was found".
-      #   2) ".../Files/Languages/Unofficial/Japanese.isl" -- caminho errado, dava 404.
-      #      A maioria das traduções da comunidade fica em Unofficial/, mas o
-      #      Japanese.isl é exceção: fica direto em Files/Languages/, junto dos
-      #      idiomas oficiais.
-      #   3) (a certa) ".../Files/Languages/Japanese.isl", branch "main" -- confirmada
-      #      inspecionando o repositório jrsoftware/issrc diretamente.
       - name: Baixar tradução não-oficial do Inno Setup (Japonês)
         if: github.event_name == 'release'
         shell: pwsh
@@ -164,8 +95,6 @@ jobs:
           Invoke-WebRequest -Uri $url -OutFile $destino
           Write-Host "Baixado: Japanese.isl"
 
-      # Passa a versão por fora via /D -- funciona porque o .iss tem o bloco
-      # #ifndef MyAppVersion / #define ... / #endif em vez de #define fixo.
       - name: Compilar instalador com Inno Setup
         if: github.event_name == 'release'
         shell: pwsh
@@ -185,8 +114,6 @@ jobs:
           Write-Host "Instalador encontrado: $caminho"
           "CAMINHO_INSTALADOR=$caminho" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
 
-      # Em push normal, só guarda o build como artefato pra conferência --
-      # não anexa em lugar nenhum público.
       - name: Salvar artefato de build (push/manual)
         if: github.event_name != 'release'
         uses: actions/upload-artifact@v4
@@ -195,10 +122,6 @@ jobs:
           path: bin/Release/net8.0-windows/win-x64/
           retention-days: 7
 
-      # Anexa o instalador real na própria Release. Esse passo precisa terminar
-      # ANTES do próximo (atualizar version.json), senão o link fica quebrado --
-      # por isso os dois estão no mesmo job, em sequência, e não em dois workflows
-      # separados escutando o mesmo evento.
       - name: Anexar instalador na Release
         if: github.event_name == 'release'
         uses: softprops/action-gh-release@v2
@@ -206,24 +129,6 @@ jobs:
           files: ${{ env.CAMINHO_INSTALADOR }}
           tag_name: ${{ github.event.release.tag_name }}
 
-      # SÓ RODA DEPOIS que o instalador já está anexado na Release (passo acima
-      # concluído com sucesso) -- garante que a URL que vai pro version.json já existe
-      # de verdade antes de qualquer usuário poder vê-la.
-      #
-      # NOTA (histórico do bug de heredoc): esse step antes rodava o código Python
-      # via heredoc Bash direto no run: ("python3 <<'PYEOF' ... PYEOF"). Isso quebrava
-      # de forma intermitente em runners Windows -- mesmo com "shell: bash" e mesmo
-      # com core.autocrlf desativado no checkout -- porque o PRÓPRIO ARQUIVO .yml
-      # podia estar armazenado no repositório com CRLF de verdade dentro do blob do
-      # Git (não é só uma questão de config de checkout: se o conteúdo salvo já tem
-      # "\r\n", é isso que o bash vai ler, ponto final). O marcador de fechamento
-      # "PYEOF" virava "PYEOF\r" e o bash não reconhecia o fim do heredoc, gerando
-      # "Missing file specification after redirection operator."
-      #
-      # A correção definitiva foi tirar o heredoc da jogada: o código agora vive num
-      # arquivo .py de verdade (scripts/atualizar_version_json.py), e Python lê
-      # qualquer terminação de linha sem problema nenhum (universal newlines) -- não
-      # importa mais se o arquivo está em LF ou CRLF.
       - name: Atualizar version.json com os dados da Release
         if: github.event_name == 'release'
         env:
@@ -232,10 +137,6 @@ jobs:
           REPO: ${{ github.repository }}
         run: python3 scripts/atualizar_version_json.py
 
-      # shell: bash -- OBRIGATÓRIO aqui também, pelo mesmo motivo acima. O bloco
-      # "if git diff --cached --quiet; then ... fi" é sintaxe Bash (PowerShell usa
-      # "if (...) { }", não "if...then...fi") -- sem essa linha, esse passo quebraria
-      # com ParserError no PowerShell.
       - name: Commit e push do version.json
         if: github.event_name == 'release'
         shell: bash

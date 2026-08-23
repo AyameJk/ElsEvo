@@ -2,17 +2,13 @@ using System.IO;
 
 namespace ElsEvo
 {
-    /// <summary>
-    /// Réplica do PatchInfo(Preset) original: calcula onde o arquivo modificado deve
-    /// ir (destino real no jogo) e onde fica o backup do original — quando existe.
-    /// BGM não tem backup porque cai numa pasta própria (Media) sem sobrescrever nada.
-    /// </summary>
+
     public class PatchInfo
     {
-        public string ArquivoModificado { get; }     // arquivo de origem, dentro do pack
-        public string ArquivoTemporario { get; }     // cópia em cache (staging)
-        public string ArquivoDestino { get; }         // onde entra de fato no jogo
-        public string? ArquivoBackup { get; }         // null para BGM
+        public string ArquivoModificado { get; }
+        public string ArquivoTemporario { get; }
+        public string ArquivoDestino { get; }
+        public string? ArquivoBackup { get; }
 
         public PatchInfo(ModAtivo mod)
         {
@@ -29,7 +25,7 @@ namespace ElsEvo
                     ArquivoDestino = Path.Combine(Paths.Elsword.Media, mod.Arquivo);
                     ArquivoBackup = null;
                     break;
-                default: // Geral
+                default:
                     ArquivoDestino = Path.Combine(Paths.Elsword.Data, mod.Arquivo);
                     ArquivoBackup = Path.Combine(Paths.Elsword.Backup, mod.Arquivo);
                     break;

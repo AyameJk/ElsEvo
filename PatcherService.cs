@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace ElsEvo
 {
-    /// <summary>Estados equivalentes ao enum BackgroundFilePatcher.States original.</summary>
+
     public enum EstadoPatch
     {
         PreparandoArquivos,
@@ -19,14 +19,6 @@ namespace ElsEvo
         Concluido
     }
 
-    /// <summary>
-    /// Fluxo do patch, com duas garantias importantes que faltavam:
-    ///   1) Um arquivo falhar ao mover (em uso, bloqueado por antivírus, etc.) NÃO trava
-    ///      os outros — cada arquivo tenta sozinho, com algumas tentativas rápidas.
-    ///   2) A RESTAURAÇÃO DO BACKUP SEMPRE roda no final (try/finally), mesmo que algo
-    ///      dê errado no meio do caminho — nunca fica arquivo original preso na pasta
-    ///      de backup por causa de um erro em outro arquivo.
-    /// </summary>
     public static class PatcherService
     {
         public static async Task ExecutarFluxoPatchAsync(
@@ -43,7 +35,6 @@ namespace ElsEvo
 
             int CalcularPercentual(int indiceAtual, int total) => total == 0 ? 100 : indiceAtual * 100 / total;
 
-            // 1) Copia cada mod pra pasta de cache (staging)
             Reportar(EstadoPatch.PreparandoArquivos, 0);
             for (int i = 0; i < listaPatches.Count; i++)
             {
@@ -56,13 +47,11 @@ namespace ElsEvo
                 Reportar(EstadoPatch.PreparandoArquivos, CalcularPercentual(i, listaPatches.Count));
             }
 
-            // 2) Logs client-side
             if (Properties.Settings.Default.BlockLogs)
                 Paths.Elsword.BlockLogs();
             else
                 Paths.Elsword.UnblockLogs();
 
-            // 3) Abre o launcher e ESPERA ELE FECHAR
             var cfg = Properties.Settings.Default;
             Process? processoLauncher = null;
 
@@ -78,13 +67,9 @@ namespace ElsEvo
                 }
             }
 
-            // A partir daqui, garantimos que a restauração sempre roda no final,
-            // não importa o que aconteça (erro de arquivo, cancelamento, exceção qualquer).
             try
             {
-                // 4+5) Backup + aplica, arquivo por arquivo (junto, não em duas passadas
-                //      separadas) — reduz a janela de tempo em que o jogo pode ler um
-                //      arquivo pela metade do processo.
+
                 Reportar(EstadoPatch.FazendoBackup, 0);
                 for (int i = 0; i < listaPatches.Count; i++)
                 {
@@ -101,8 +86,6 @@ namespace ElsEvo
 
                 LimparPasta(Paths.Main.Cache);
 
-                // 6) Se ainda não tiver processo de jogo (SkipLauncher+X2Args), abre agora;
-                //    senão, só aguarda o x2.exe aparecer.
                 Process? processoJogo;
                 if (cfg.SkipLauncher && !string.IsNullOrWhiteSpace(cfg.X2Args))
                 {
@@ -112,8 +95,7 @@ namespace ElsEvo
                 {
                     processoJogo = Paths.Elsword.GetClientProcess();
                     int tentativas = 0;
-                    // Até 2 minutos esperando o processo aparecer — tempo de sobra pro launcher
-                    // fechar, mover os arquivos e o cliente (x2.exe OU x2_dx11.exe) abrir.
+
                     while (processoJogo == null && tentativas < 120)
                     {
                         cancelamento.ThrowIfCancellationRequested();
@@ -123,16 +105,13 @@ namespace ElsEvo
                     }
                 }
 
-                // 7) Espera o jogo fechar
                 Reportar(EstadoPatch.AguardandoElswordFechar, 100);
                 if (processoJogo != null)
                     await Task.Run(() => processoJogo.WaitForExit(), cancelamento);
             }
             finally
             {
-                // 8) Restaura tudo — SEMPRE roda, mesmo se algo acima deu errado.
-                //    Cada arquivo tenta algumas vezes (o processo do jogo pode levar um
-                //    instante pra soltar o handle do arquivo depois de fechar).
+
                 Reportar(EstadoPatch.RestaurandoBackup, 0);
                 for (int i = 0; i < listaPatches.Count; i++)
                 {
@@ -156,12 +135,6 @@ namespace ElsEvo
             }
         }
 
-        /// <summary>
-        /// Tenta a operação até 5 vezes com uma pausa curta entre elas (o arquivo pode estar
-        /// momentaneamente em uso — pelo antivírus, pelo próprio Windows, ou pelo jogo ainda
-        /// soltando o handle). Se todas as tentativas falharem, desiste desse arquivo
-        /// específico SEM travar o resto do processo (só ignora e segue pro próximo).
-        /// </summary>
         private static void TentarComRetentativa(Action acao, int tentativas = 5, int esperaMs = 150)
         {
             for (int i = 0; i < tentativas; i++)

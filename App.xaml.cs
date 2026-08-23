@@ -17,7 +17,7 @@ namespace ElsEvo
 
             if (Settings.Default.StartHidden)
             {
-                // Abre já minimizado/na bandeja em vez de aparecer na tela.
+
                 janelaPrincipal.WindowState = WindowState.Minimized;
                 janelaPrincipal.Show();
                 janelaPrincipal.Hide();

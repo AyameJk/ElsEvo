@@ -11,7 +11,6 @@
 
     <Window.Resources>
 
-        <!-- Botão flat padrão da janela -->
         <Style x:Key="BotaoFlat" TargetType="Button">
             <Setter Property="Background" Value="{DynamicResource CorBotaoFlat}"/>
             <Setter Property="Foreground" Value="{DynamicResource CorTextoPrimario}"/>
@@ -63,7 +62,6 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <!-- Barra superior: Desabilitar/Habilitar todos + Aplicar + Menu -->
         <Grid Grid.Row="0" Margin="0,0,0,10">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
@@ -128,7 +126,6 @@
             </Grid>
         </Grid>
 
-        <!-- Abas + Pesquisa -->
         <Grid Grid.Row="1" Margin="0,0,0,10">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
@@ -159,7 +156,6 @@
                      Tag="🔍 Pesquisar"/>
         </Grid>
 
-        <!-- Barra de progresso da importação (só aparece durante Importar pasta/.zip) -->
         <Grid Grid.Row="2" x:Name="ProgressoImportacaoContainer" Visibility="Collapsed" Margin="0,0,0,10">
             <Border Height="20" CornerRadius="10" Background="{DynamicResource CorFundoPrincipal}" BorderBrush="{DynamicResource CorBorda}" BorderThickness="1">
                 <Grid>
@@ -185,7 +181,6 @@
             </Border>
         </Grid>
 
-        <!-- Tabela de mods -->
         <Border Grid.Row="3"
                 Background="{DynamicResource CorFundoPrincipal}"
                 BorderBrush="{DynamicResource CorBorda}"
@@ -209,8 +204,7 @@
                       HorizontalScrollBarVisibility="Disabled">
 
                 <DataGrid.Resources>
-                    <!-- Destaque de seleção azul (o padrão do Windows fica meio branco/apagado
-                         em cima do fundo escuro, dificultando ver o que está selecionado). -->
+
                     <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="#2D5A8C"/>
                     <SolidColorBrush x:Key="{x:Static SystemColors.HighlightTextBrushKey}" Color="White"/>
                     <SolidColorBrush x:Key="{x:Static SystemColors.ControlBrushKey}" Color="#24425E"/>
@@ -227,9 +221,6 @@
                     </Style>
                 </DataGrid.ColumnHeaderStyle>
 
-                <!-- Linha: quando selecionada, fundo azul explícito (não depende só do
-                     resource SystemColors, que nem sempre é respeitado por colunas
-                     de template como o ComboBox de "Mod"). -->
                 <DataGrid.RowStyle>
                     <Style TargetType="DataGridRow">
                         <Setter Property="Background" Value="Transparent"/>
@@ -242,9 +233,6 @@
                     </Style>
                 </DataGrid.RowStyle>
 
-                <!-- Célula: mesmo tratamento — cobre o texto de "Descrição" quando a
-                     linha está selecionada, e remove o retângulo de foco padrão do
-                     Windows (que aparecia branco/tracejado em cima do fundo escuro). -->
                 <DataGrid.CellStyle>
                     <Style TargetType="DataGridCell">
                         <Setter Property="BorderThickness" Value="0"/>
@@ -263,9 +251,6 @@
                 <DataGrid.Columns>
                     <DataGridTextColumn Header="Arquivo" Binding="{Binding Arquivo}" Width="110"/>
 
-                    <!-- Descrição é editável (clique duplo) — antes disso virava um TextBox
-                         BRANCO padrão do Windows (nunca tinha sido estilizado). Agora segue
-                         o tema escuro/claro do app igual o resto da janela. -->
                     <DataGridTextColumn Header="Descrição" Binding="{Binding Descricao}" Width="*">
                         <DataGridTextColumn.EditingElementStyle>
                             <Style TargetType="TextBox">
@@ -295,7 +280,6 @@
 
         </Border>
 
-        <!-- Botões finais -->
         <StackPanel Grid.Row="4"
                     Orientation="Horizontal"
                     HorizontalAlignment="Right"
