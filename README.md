@@ -94,10 +94,10 @@ Uso não comercial. Este é um projeto pessoal, sem vínculo oficial com a KOG G
 
 Desenvolvido por **[AyameJk](https://github.com/AyameJk)**
 
+<p align="center">
+  <img width="602" height="422" alt="ElsEvo_logo" src="COLE_AQUI_A_NOVA_URL_DA_IMAGEM"/>
+</p>
 
-  <p align="center">
-  <img width="602" height="422" alt="ElsEvo_logo" src="https://github.com/user-attachments/assets/a9a4e6bc-7614-456b-aae2-934de3c6351f"/>
-
-  <p align="center"> <i>「 "A natureza nos guia, e a esperança nos mantém firmes..." - Rena 」</i>
-    
+<p align="center">
+  <i>「 "A natureza nos guia, e a esperança nos mantém firmes..." - Rena 」</i>
 </p>
