@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ElsEvo — Gerenciador de mods para Elsword</title>
+<meta name="description" content="ElsEvo automatiza a instalação e remoção de mods do Elsword, com backup automático, auto-atualização e suporte a múltiplos idiomas.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #1e1e1e;
+    --card: #252526;
+    --field: #1e1e1e;
+    --border: #3f3f46;
+    --text: #e3e3e3;
+    --text-secondary: #858585;
+    --accent: #0078d4;
+    --accent-hover: #1387e8;
+    --success-bg: #263d30;
+    --success-border: #4e9f6d;
+    --success-text: #69e292;
+    --danger-bg: #3d2626;
+    --danger-border: #9f4e4e;
+    --danger-text: #f28b82;
+    --amber-bg: #3d2f1e;
+    --amber-border: #b8860b;
+    --amber-text: #e0b060;
+    /* Cor do canal Beta — no tema escuro fica âmbar, igual ao badge/aviso beta do
+       app (AtualizarCorAvisoBeta / AtualizarCorBadgeBeta). */
+    --beta-bg: #3d2f1e;
+    --beta-border: #b8860b;
+    --beta-text: #e0b060;
+    --shadow: 0 1px 0 rgba(255,255,255,0.03) inset, 0 12px 32px rgba(0,0,0,0.35);
+  }
+
+  [data-theme="claro"] {
+    --bg: #f3f3f3;
+    --card: #ffffff;
+    --field: #ffffff;
+    --border: #d0d0d0;
+    --text: #1a1a1a;
+    --text-secondary: #5a5a5a;
+    --success-bg: #e6f4ea;
+    --success-border: #2e7d32;
+    --success-text: #1e5e26;
+    --danger-bg: #fdeaea;
+    --danger-border: #e36464;
+    --danger-text: #b71c1c;
+    --amber-bg: #fff6e6;
+    --amber-border: #d9a441;
+    --amber-text: #8a5f10;
+    /* No tema claro, o canal Beta vira vermelho — mesma troca que o app faz
+       (o âmbar clarinho tem contraste ruim em fundo claro; ver comentário
+       original em AtualizarCorAvisoBeta no AtualizacaoWindow.xaml.cs). */
+    --beta-bg: #fdeaea;
+    --beta-border: #e36464;
+    --beta-text: #b71c1c;
+    --shadow: 0 1px 0 rgba(0,0,0,0.02) inset, 0 12px 32px rgba(0,0,0,0.08);
+  }
+
+  * { box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', system-ui, sans-serif;
+    transition: background 0.25s ease, color 0.25s ease;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1, h2, h3, .display {
+    font-family: 'Space Grotesk', 'Inter', sans-serif;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    margin: 0;
+  }
+
+  .mono {
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  a { color: inherit; }
+
+  .wrap {
+    max-width: 1080px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+
+  /* ===== Navbar ===== */
+  header.nav {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: color-mix(in srgb, var(--bg) 88%, transparent);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .nav-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 64px;
+  }
+
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 700;
+    font-size: 17px;
+  }
+
+  .brand .dot {
+    width: 26px;
+    height: 26px;
+    border-radius: 8px;
+    background: linear-gradient(135deg, var(--accent), #63b3ed);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    font-weight: 700;
+  }
+
+  .brand-logo {
+    height: 28px;
+    width: auto;
+  }
+
+  nav.links {
+    display: flex;
+    align-items: center;
+    gap: 28px;
+    font-size: 14px;
+    color: var(--text-secondary);
+  }
+
+  nav.links a { text-decoration: none; transition: color 0.15s; }
+  nav.links a:hover { color: var(--text); }
+
+  .nav-actions { display: flex; align-items: center; gap: 12px; }
+
+  .theme-toggle {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--card);
+    color: var(--text);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 15px;
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 18px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    text-decoration: none;
+    border: 1px solid transparent;
+    cursor: pointer;
+    transition: background 0.15s, transform 0.1s, border-color 0.15s;
+  }
+  .btn:active { transform: scale(0.98); }
+
+  .btn-primary { background: var(--accent); color: #fff; }
+  .btn-primary:hover { background: var(--accent-hover); }
+
+  .btn-ghost {
+    background: transparent;
+    border-color: var(--border);
+    color: var(--text);
+  }
+  .btn-ghost:hover { background: var(--card); }
+
+  /* ===== Hero ===== */
+  .hero {
+    padding: 88px 0 72px;
+    display: grid;
+    grid-template-columns: 1.05fr 0.95fr;
+    gap: 56px;
+    align-items: center;
+  }
+
+  .eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--accent);
+    background: color-mix(in srgb, var(--accent) 12%, transparent);
+    border: 1px solid color-mix(in srgb, var(--accent) 35%, transparent);
+    padding: 5px 12px;
+    border-radius: 100px;
+    margin-bottom: 20px;
+  }
+
+  .hero h1 {
+    font-size: 46px;
+    line-height: 1.08;
+  }
+
+  .hero h1 span { color: var(--accent); }
+
+  .hero p.lead {
+    color: var(--text-secondary);
+    font-size: 16px;
+    line-height: 1.65;
+    max-width: 480px;
+    margin: 20px 0 32px;
+  }
+
+  .hero-ctas { display: flex; gap: 12px; flex-wrap: wrap; }
+
+  .hero-note {
+    margin-top: 18px;
+    font-size: 13px;
+    color: var(--text-secondary);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  /* ===== App mockup (signature element) ===== */
+  .mock-shell {
+    display: flex;
+    justify-content: center;
+    perspective: 1400px;
+  }
+
+  .mock-window {
+    width: 300px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    box-shadow: var(--shadow);
+    overflow: hidden;
+    transform: rotateY(-8deg) rotateX(2deg);
+    transition: transform 0.4s ease;
+  }
+  .mock-shell:hover .mock-window { transform: rotateY(0deg) rotateX(0deg); }
+
+  .mock-titlebar {
+    height: 34px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 12px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .mock-brand { display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 600; }
+  .mock-brand .ic { width: 16px; height: 16px; border-radius: 5px; background: var(--accent); }
+
+  .mock-dots { display: flex; gap: 6px; }
+  .mock-dots span { width: 9px; height: 9px; border-radius: 3px; background: var(--border); }
+
+  .mock-body { padding: 16px; }
+
+  .mock-badge-row { display: flex; justify-content: flex-end; margin-bottom: 14px; }
+  .mock-badge {
+    background: var(--success-bg);
+    border: 1px solid var(--success-border);
+    color: var(--success-text);
+    font-size: 10px;
+    font-weight: 700;
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  .mock-label {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--text-secondary);
+    margin-bottom: 8px;
+    font-weight: 600;
+  }
+
+  .mock-list {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px;
+    margin-bottom: 16px;
+  }
+
+  .mock-list-item {
+    font-size: 12px;
+    padding: 7px 8px;
+    border-radius: 5px;
+  }
+  .mock-list-item:nth-child(odd) { background: color-mix(in srgb, var(--accent) 6%, transparent); }
+
+  .mock-btn-secondary {
+    width: 100%;
+    text-align: center;
+    padding: 9px;
+    border-radius: 7px;
+    background: var(--field);
+    border: 1px solid var(--border);
+    font-size: 12px;
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+
+  .mock-btn-primary {
+    width: 100%;
+    text-align: center;
+    padding: 11px;
+    border-radius: 7px;
+    background: var(--accent);
+    color: #fff;
+    font-size: 12.5px;
+    font-weight: 700;
+  }
+
+  /* ===== Sections ===== */
+  section { padding: 64px 0; }
+  section.divider { border-top: 1px solid var(--border); }
+
+  .section-head { text-align: center; max-width: 560px; margin: 0 auto 44px; }
+  .section-head .eyebrow { margin-bottom: 14px; }
+  .section-head h2 { font-size: 30px; margin-bottom: 12px; }
+  .section-head p { color: var(--text-secondary); font-size: 15px; line-height: 1.6; }
+
+  /* ===== Features ===== */
+  .features {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+  }
+
+  .feature-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 22px;
+  }
+
+  .feature-card .ic {
+    width: 34px;
+    height: 34px;
+    border-radius: 9px;
+    background: color-mix(in srgb, var(--accent) 14%, transparent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    margin-bottom: 14px;
+  }
+
+  .feature-card h3 { font-size: 15px; margin-bottom: 6px; }
+  .feature-card p { font-size: 13px; color: var(--text-secondary); line-height: 1.55; margin: 0; }
+
+  /* ===== Download ===== */
+  .download-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+
+  .channel-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 28px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .channel-card.beta { border-color: var(--beta-border); }
+
+  .channel-tag {
+    display: inline-block;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 6px;
+    margin-bottom: 16px;
+  }
+  .channel-tag.stable { background: var(--success-bg); border: 1px solid var(--success-border); color: var(--success-text); }
+  .channel-tag.beta { background: var(--beta-bg); border: 1px solid var(--beta-border); color: var(--beta-text); }
+
+  .channel-card h3 { font-size: 19px; margin-bottom: 8px; }
+  .channel-card p { color: var(--text-secondary); font-size: 13.5px; line-height: 1.6; margin: 0 0 20px; }
+
+  .channel-card .btn { width: 100%; justify-content: center; }
+
+  .smartscreen-note {
+    margin-top: 28px;
+    display: flex;
+    gap: 12px;
+    padding: 14px 16px;
+    border-radius: 10px;
+    background: var(--amber-bg);
+    border: 1px solid var(--amber-border);
+    color: var(--amber-text);
+    font-size: 13px;
+    line-height: 1.6;
+  }
+
+  /* ===== Donate ===== */
+  .donate-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+
+  .donate-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 26px;
+  }
+
+  .donate-card .ic-row { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+  .donate-card .ic-row .ic {
+    width: 32px; height: 32px; border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 15px; color: #fff;
+  }
+  .donate-card h3 { font-size: 16px; }
+
+  .pix-key {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    background: var(--field);
+    border: 1px dashed var(--border);
+    border-radius: 8px;
+    padding: 12px 14px;
+    margin: 14px 0 8px;
+  }
+
+  .pix-key span { font-family: 'JetBrains Mono', monospace; font-size: 13px; word-break: break-all; }
+
+  .copy-btn {
+    flex-shrink: 0;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text);
+    border-radius: 6px;
+    padding: 6px 10px;
+    font-size: 12px;
+    cursor: pointer;
+  }
+  .copy-btn:hover { background: var(--bg); }
+
+  .donate-card .hint { font-size: 12px; color: var(--text-secondary); margin-top: 10px; }
+
+  /* ===== Footer ===== */
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 40px 0 32px;
+  }
+
+  .footer-inner {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+
+  .footer-links { display: flex; gap: 22px; font-size: 13px; color: var(--text-secondary); }
+  .footer-links a { text-decoration: none; }
+  .footer-links a:hover { color: var(--text); }
+
+  .footer-copy { font-size: 12px; color: var(--text-secondary); }
+
+  @media (max-width: 860px) {
+    .hero { grid-template-columns: 1fr; padding-top: 56px; text-align: center; }
+    .hero p.lead { margin-left: auto; margin-right: auto; }
+    .hero-ctas, .hero-note { justify-content: center; }
+    .mock-shell { order: -1; }
+    .features { grid-template-columns: repeat(2, 1fr); }
+    .download-grid, .donate-grid { grid-template-columns: 1fr; }
+    nav.links { display: none; }
+    .hero h1 { font-size: 34px; }
+  }
+</style>
+</head>
+<body data-theme="escuro">
+
+  <header class="nav">
+    <div class="wrap nav-inner">
+      <div class="brand">
+        <img src="assets/logo.png" alt="ElsEvo" class="brand-logo">
+        ElsEvo
+      </div>
+      <nav class="links">
+        <a href="#recursos">Recursos</a>
+        <a href="#download">Download</a>
+        <a href="#apoie">Apoiar</a>
+        <a href="https://github.com/AyameJk/ElsEvo" target="_blank" rel="noopener">GitHub</a>
+      </nav>
+      <div class="nav-actions">
+        <button class="theme-toggle" id="themeToggle" aria-label="Alternar tema" title="Alternar tema">🌙</button>
+        <a href="#download" class="btn btn-primary">Baixar</a>
+      </div>
+    </div>
+  </header>
+
+  <section class="hero wrap">
+    <div>
+      <div class="eyebrow">● gratuito &amp; open-source</div>
+      <h1>Mods do Elsword,<br>sem <span>complicação</span>.</h1>
+      <p class="lead">
+        O ElsEvo troca os arquivos do jogo pelos seus mods, faz backup automático e
+        restaura tudo sozinho quando você fecha o cliente. Sem editar pasta nenhuma
+        na mão.
+      </p>
+      <div class="hero-ctas">
+        <a href="#download" class="btn btn-primary">⬇ Baixar ElsEvo</a>
+        <a href="https://github.com/AyameJk/ElsEvo" target="_blank" rel="noopener" class="btn btn-ghost">Ver código-fonte</a>
+      </div>
+      <div class="hero-note">
+        <span class="mono" style="color: var(--success-text);">v1.0</span>
+        <span>· Windows 10/11 · .NET 8</span>
+      </div>
+    </div>
+
+    <div class="mock-shell">
+      <div class="mock-window">
+        <div class="mock-titlebar">
+          <div class="mock-brand"><span class="ic"></span> ElsEvo</div>
+          <div class="mock-dots"><span></span><span></span><span></span></div>
+        </div>
+        <div class="mock-body">
+          <div class="mock-badge-row"><span class="mock-badge">LIGADO</span></div>
+          <div class="mock-label">Mods ativos</div>
+          <div class="mock-list">
+            <div class="mock-list-item">VozesPT-BR (12 arquivos)</div>
+            <div class="mock-list-item">UI Retro</div>
+            <div class="mock-list-item">TrilhaSonoraClassica</div>
+          </div>
+          <div class="mock-btn-secondary">Gerenciar Mods</div>
+          <div class="mock-btn-primary">Aplicar e Jogar</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="recursos" class="divider">
+    <div class="wrap">
+      <div class="section-head">
+        <div class="eyebrow">recursos</div>
+        <h2>Feito pra quem só quer jogar</h2>
+        <p>Cada detalhe do ElsEvo existe pra evitar que você mexa em arquivo do jogo na mão.</p>
+      </div>
+      <div class="features">
+        <div class="feature-card">
+          <div class="ic">🧩</div>
+          <h3>Gerenciamento de mods</h3>
+          <p>Importe pastas ou .zip, organize por categoria (Geral/BGM/Vídeo) e ative com um clique.</p>
+        </div>
+        <div class="feature-card">
+          <div class="ic">🛟</div>
+          <h3>Backup automático</h3>
+          <p>Os arquivos originais voltam sozinhos assim que você fecha o jogo — nunca fica sujo.</p>
+        </div>
+        <div class="feature-card">
+          <div class="ic">🔄</div>
+          <h3>Auto-atualização</h3>
+          <p>O app se atualiza sozinho, com notas de lançamento e instalação silenciosa.</p>
+        </div>
+        <div class="feature-card">
+          <div class="ic">🎨</div>
+          <h3>Tema &amp; idioma</h3>
+          <p>Claro ou escuro, em Português, Inglês ou Chinês — do jeito que for melhor pra você.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="download" class="divider">
+    <div class="wrap">
+      <div class="section-head">
+        <div class="eyebrow">download</div>
+        <h2>Escolha seu canal</h2>
+        <p>Estável é o recomendado pro dia a dia. Beta traz novidades antes, mas pode ter bugs.</p>
+      </div>
+
+      <div class="download-grid">
+        <div class="channel-card">
+          <span class="channel-tag stable">CANAL ESTÁVEL</span>
+          <h3>ElsEvo</h3>
+          <p>Versão testada e recomendada para a maioria dos jogadores. Atualizações menos frequentes, mais estabilidade.</p>
+          <a href="https://github.com/AyameJk/ElsEvo/releases/latest" target="_blank" rel="noopener" class="btn btn-primary">⬇ Baixar versão estável</a>
+        </div>
+        <div class="channel-card beta">
+          <span class="channel-tag beta">CANAL BETA</span>
+          <h3>ElsEvo Beta</h3>
+          <p>Recursos novos chegam primeiro aqui. Pode ter instabilidades — ideal pra quem quer testar e reportar bugs.</p>
+          <a href="https://github.com/AyameJk/ElsEvoBeta/releases/latest" target="_blank" rel="noopener" class="btn" style="width:100%; justify-content:center; background: var(--beta-border); color:#fff;">⬇ Baixar versão beta</a>
+        </div>
+      </div>
+
+      <div class="smartscreen-note">
+        <span>⚠️</span>
+        <span>
+          <strong>Aviso:</strong> como o instalador não é assinado digitalmente, o Windows
+          SmartScreen ou seu antivírus pode exibir um alerta durante o download ou a
+          instalação. Isso é esperado para projetos independentes — prossiga por sua conta,
+          ou compile o app você mesmo a partir do código-fonte no GitHub.
+        </span>
+      </div>
+    </div>
+  </section>
+
+  <section id="apoie" class="divider">
+    <div class="wrap">
+      <div class="section-head">
+        <div class="eyebrow">apoie o projeto</div>
+        <h2>Gostou do ElsEvo?</h2>
+        <p>O projeto é gratuito e sem anúncios. Se quiser ajudar a manter o desenvolvimento, qualquer valor é bem-vindo.</p>
+      </div>
+
+      <div class="donate-grid">
+        <div class="donate-card">
+          <div class="ic-row">
+            <span class="ic" style="background:#32bcad;">🔑</span>
+            <h3>Pix</h3>
+          </div>
+          <p style="color: var(--text-secondary); font-size: 13.5px; margin: 0;">Escaneie o QR Code ou copie a chave abaixo no app do seu banco.</p>
+
+          <div style="display:flex; justify-content:center; margin: 16px 0;">
+            <div style="background:#fff; padding:10px; border-radius:10px; border:1px solid var(--border);">
+              <img src="assets/pix-qrcode.png" alt="QR Code Pix" width="160" height="160" style="display:block;">
+            </div>
+          </div>
+
+          <div class="pix-key">
+            <span id="pixKey">da83c196-7a9d-4183-bfee-3ced2b5340bf</span>
+            <button class="copy-btn" onclick="copiarPix()">Copiar</button>
+          </div>
+          <div class="hint">Chave aleatória — não identifica dados pessoais.</div>
+        </div>
+
+        <div class="donate-card">
+          <div class="ic-row" style="margin-bottom: 60px; gap: 4px;">
+            <img src="assets/paypal-icon.png" alt="" style="height:200px; width:auto; object-fit:contain;">
+            <img src="assets/paypal-wordmark.png" alt="PayPal" style="height:100px; width:auto; object-fit:contain;">
+          </div>
+          <p style="color: var(--text-secondary); font-size: 13.5px; margin: 0 0 16px;">Prefere internacional? Doe direto por PayPal.</p>
+          <a href="https://www.paypal.com/donate?business=ayame157@hotmail.com&currency_code=BRL" target="_blank" rel="noopener" class="btn btn-primary" style="width:100%; justify-content:center; background:#0070ba;">Doar via PayPal</a>
+          <div class="hint">Você será redirecionado pro site oficial do PayPal.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="wrap footer-inner">
+      <div class="brand" style="font-size: 14px;">
+        <img src="assets/logo.png" alt="ElsEvo" class="brand-logo" style="height:22px; width:auto;">
+        ElsEvo
+      </div>
+      <div class="footer-links">
+        <a href="https://github.com/AyameJk/ElsEvo" target="_blank" rel="noopener">GitHub</a>
+        <a href="https://github.com/AyameJk/ElsEvo/releases" target="_blank" rel="noopener">Changelog</a>
+        <a href="https://github.com/AyameJk/ElsEvo/issues" target="_blank" rel="noopener">Reportar bug</a>
+      </div>
+      <div class="footer-copy">Feito por AyameJk · Projeto de fã, sem vínculo com a KOG Games.</div>
+    </div>
+  </footer>
+
+  <script>
+    // ===== Tema claro/escuro — espelha as mesmas cores do ThemeManager.cs do app =====
+    const body = document.body;
+    const toggleBtn = document.getElementById('themeToggle');
+
+    function aplicarTema(tema) {
+      body.setAttribute('data-theme', tema);
+      toggleBtn.textContent = tema === 'claro' ? '☀️' : '🌙';
+      localStorage.setItem('elsevo-tema', tema);
+    }
+
+    const temaSalvo = localStorage.getItem('elsevo-tema') || 'escuro';
+    aplicarTema(temaSalvo);
+
+    toggleBtn.addEventListener('click', () => {
+      const atual = body.getAttribute('data-theme');
+      aplicarTema(atual === 'escuro' ? 'claro' : 'escuro');
+    });
+
+    // ===== Copiar chave Pix =====
+    function copiarPix() {
+      const chave = document.getElementById('pixKey').textContent;
+      navigator.clipboard.writeText(chave).then(() => {
+        const btn = document.querySelector('.copy-btn');
+        const textoOriginal = btn.textContent;
+        btn.textContent = 'Copiado!';
+        setTimeout(() => { btn.textContent = textoOriginal; }, 1500);
+      });
+    }
+  </script>
+
+</body>
+</html>
