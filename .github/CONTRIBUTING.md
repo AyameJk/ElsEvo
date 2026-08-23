@@ -23,7 +23,7 @@ dotnet publish ElsEvo.csproj -c Release -r win-x64 --self-contained true -p:Publ
 
 ## Convenções
 
-- Nomenclatura e comentários em português (ex.: `GerenciadorDeMods`,
+- Nomenclatura em português (ex.: `GerenciadorDeMods`,
   `AplicarTemaSalvo`)
 - Texto de interface via `Idiomas.T("Chave")`, nunca string fixa — adicione
   a tradução em PT/EN/ZH
