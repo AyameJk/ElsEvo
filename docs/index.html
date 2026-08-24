@@ -21,6 +21,7 @@
     --success-bg: #263d30;
     --success-border: #4e9f6d;
     --success-text: #69e292;
+    --stable-border: #4e9f6d;
     --danger-bg: #3d2626;
     --danger-border: #9f4e4e;
     --danger-text: #f28b82;
@@ -49,6 +50,7 @@
     --success-bg: #e6f4ea;
     --success-border: #2e7d32;
     --success-text: #1e5e26;
+    --stable-border: #0078d4;
     --danger-bg: #fdeaea;
     --danger-border: #e36464;
     --danger-text: #b71c1c;
@@ -397,6 +399,7 @@
     overflow: hidden;
   }
 
+  .channel-card.stable { border-color: var(--stable-border); }
   .channel-card.beta { border-color: var(--beta-border); }
 
   .channel-tag {
@@ -637,6 +640,49 @@
     text-align: center;
   }
 
+  /* ===== Botão "voltar ao topo" ===== */
+  .scroll-top-btn {
+    position: fixed;
+    right: 24px;
+    bottom: 24px;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: var(--card);
+    border: 1px solid var(--border);
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: var(--shadow);
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(10px);
+    transition: opacity 0.25s ease, transform 0.25s ease, border-color 0.15s ease, background 0.15s ease;
+    z-index: 40;
+  }
+
+  .scroll-top-btn.visible {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateY(0);
+  }
+
+  .scroll-top-btn:hover {
+    border-color: var(--accent);
+    background: color-mix(in srgb, var(--accent) 10%, var(--card));
+  }
+
+  .scroll-top-btn svg {
+    width: 18px;
+    height: 18px;
+    stroke: var(--text);
+    transition: stroke 0.15s ease;
+  }
+
+  .scroll-top-btn:hover svg { stroke: var(--accent); }
+
   @media (max-width: 860px) {
     .hero { grid-template-columns: 1fr; padding-top: 56px; text-align: center; }
     .hero p.lead { margin-left: auto; margin-right: auto; }
@@ -752,7 +798,7 @@
       </div>
 
       <div class="download-grid">
-        <div class="channel-card">
+        <div class="channel-card stable">
           <span class="channel-tag stable" data-i18n="tagEstavel">CANAL ESTÁVEL</span>
           <h3>ElsEvo</h3>
           <p data-i18n="canalEstavelDesc">Versão testada e recomendada para a maioria dos jogadores. Atualizações menos frequentes, mais estabilidade.</p>
@@ -844,6 +890,13 @@
     </div>
   </section>
 
+  <button class="scroll-top-btn" id="scrollTopBtn" aria-label="Voltar ao topo" title="Voltar ao topo">
+    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M12 19V5"></path>
+      <path d="M5 12l7-7 7 7"></path>
+    </svg>
+  </button>
+
   <footer>
     <div class="wrap footer-top">
       <div class="footer-links-top">
@@ -851,6 +904,7 @@
         <a href="https://github.com/AyameJk/ElsEvo/releases" target="_blank" rel="noopener" data-i18n="footChangelog">Changelog</a>
         <a href="https://github.com/AyameJk/ElsEvo/issues" target="_blank" rel="noopener" data-i18n="footBug">Reportar bug</a>
         <a href="#apoie" data-i18n="footApoiar">Apoiar</a>
+        <a href="privacidade.html" data-i18n="footPrivacidade">Privacidade</a>
       </div>
       <div class="lang-wrap">
         <button class="lang-select" id="langSelect">
@@ -920,7 +974,7 @@
         pixHint: "Chave aleatória — não identifica dados pessoais.",
         paypalDesc: "Prefere internacional? Doe direto por PayPal.", paypalBtn: "Doar via PayPal",
         paypalHint: "Você será redirecionado pro site oficial do PayPal.",
-        footGithub: "GitHub", footChangelog: "Changelog", footBug: "Reportar bug", footApoiar: "Apoiar",
+        footGithub: "GitHub", footChangelog: "Changelog", footBug: "Reportar bug", footApoiar: "Apoiar", footPrivacidade: "Privacidade",
         footMeta: "© 2026 AyameJk. Projeto de fã, sem vínculo com a KOG Games.<br>Elsword e suas marcas pertencem aos seus respectivos donos.",
         footLegal: "ElsEvo não possui vínculo oficial com a KOG Games ou com o Elsword. Projeto independente, feito por fãs.",
         langLabel: "Português (Brasil)"
@@ -955,7 +1009,7 @@
         pixHint: "Random key — doesn't reveal personal data.",
         paypalDesc: "Prefer an international option? Donate directly via PayPal.", paypalBtn: "Donate via PayPal",
         paypalHint: "You'll be redirected to PayPal's official site.",
-        footGithub: "GitHub", footChangelog: "Changelog", footBug: "Report a bug", footApoiar: "Support",
+        footGithub: "GitHub", footChangelog: "Changelog", footBug: "Report a bug", footApoiar: "Support", footPrivacidade: "Privacy",
         footMeta: "© 2026 AyameJk. Fan project, not affiliated with KOG Games.<br>Elsword and its trademarks belong to their respective owners.",
         footLegal: "ElsEvo has no official affiliation with KOG Games or Elsword. Independent, fan-made project.",
         langLabel: "English"
@@ -990,7 +1044,7 @@
         pixHint: "随机密钥 —— 不会暴露个人数据。",
         paypalDesc: "偏好国际方式?直接通过 PayPal 捐赠。", paypalBtn: "通过 PayPal 捐赠",
         paypalHint: "您将被重定向到 PayPal 官方网站。",
-        footGithub: "GitHub", footChangelog: "更新日志", footBug: "报告漏洞", footApoiar: "支持",
+        footGithub: "GitHub", footChangelog: "更新日志", footBug: "报告漏洞", footApoiar: "支持", footPrivacidade: "隐私政策",
         footMeta: "© 2026 AyameJk。粉丝项目,与 KOG Games 无关。<br>Elsword 及其商标归其各自所有者所有。",
         footLegal: "ElsEvo 与 KOG Games 或 Elsword 没有官方关联。这是一个独立的粉丝制作项目。",
         langLabel: "中文"
@@ -1083,6 +1137,20 @@
           // mantém o href padrão (página de Releases) — já definido no HTML
         });
     })();
+
+    // ===== Botão "voltar ao topo" — aparece só depois de rolar a página =====
+    const scrollTopBtn = document.getElementById('scrollTopBtn');
+
+    function atualizarBotaoTopo() {
+      scrollTopBtn.classList.toggle('visible', window.scrollY > 420);
+    }
+
+    window.addEventListener('scroll', atualizarBotaoTopo, { passive: true });
+    atualizarBotaoTopo();
+
+    scrollTopBtn.addEventListener('click', () => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
 
     function copiarPix() {
       const chave = document.getElementById('pixKey').textContent;
