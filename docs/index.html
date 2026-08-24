@@ -106,15 +106,15 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    height: 64px;
+    height: 76px;
   }
 
   .brand {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 12px;
     font-weight: 700;
-    font-size: 17px;
+    font-size: 21px;
   }
 
   .brand .dot {
@@ -132,7 +132,7 @@
   }
 
   .brand-logo {
-    height: 28px;
+    height: 42px;
     width: auto;
   }
 
@@ -140,7 +140,10 @@
     display: flex;
     align-items: center;
     gap: 28px;
-    font-size: 14px;
+    font-size: 13.5px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
     color: var(--text-secondary);
   }
 
@@ -418,6 +421,47 @@
     line-height: 1.6;
   }
 
+  /* ===== Requisitos do sistema ===== */
+  .reqs-table {
+    margin-top: 36px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    overflow: hidden;
+  }
+
+  .reqs-title {
+    padding: 18px 22px;
+    border-bottom: 1px solid var(--border);
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 600;
+    font-size: 16px;
+  }
+
+  .reqs-grid {
+    display: grid;
+    grid-template-columns: 140px 1fr 1fr;
+  }
+
+  .reqs-grid > div {
+    padding: 14px 22px;
+    font-size: 13.5px;
+    border-bottom: 1px solid var(--border);
+  }
+  .reqs-grid > div:last-child, .reqs-grid > div:nth-last-child(2) { border-bottom: none; }
+
+  .reqs-head {
+    color: var(--text-secondary);
+    font-size: 11.5px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-weight: 700;
+    background: var(--bg);
+  }
+
+  .reqs-label { color: var(--text-secondary); font-weight: 600; background: var(--bg); }
+  .reqs-value { color: var(--text); }
+
   /* ===== Donate ===== */
   .donate-grid {
     display: grid;
@@ -468,25 +512,119 @@
 
   .donate-card .hint { font-size: 12px; color: var(--text-secondary); margin-top: 10px; }
 
-  /* ===== Footer ===== */
+  
   footer {
-    border-top: 1px solid var(--border);
-    padding: 40px 0 32px;
+    background: #14141a;
+    color: #d8d8de;
+    margin-top: 24px;
   }
 
-  .footer-inner {
+  .footer-top {
+    border-bottom: 1px solid #2a2a33;
+    padding: 22px 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 14px;
+  }
+
+  .footer-links-top {
+    display: flex;
+    gap: 28px;
+    font-size: 13.5px;
+    font-weight: 600;
+  }
+  .footer-links-top a { text-decoration: none; color: #d8d8de; }
+  .footer-links-top a:hover { color: #fff; }
+
+  .lang-select {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: transparent;
+    border: 1px solid #3a3a45;
+    color: #d8d8de;
+    border-radius: 6px;
+    padding: 7px 12px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .lang-select:hover { border-color: #5a5a68; }
+
+  .lang-wrap { position: relative; }
+
+  .lang-menu {
+    position: absolute;
+    bottom: calc(100% + 8px);
+    right: 0;
+    background: #1c1c24;
+    border: 1px solid #33333e;
+    border-radius: 10px;
+    padding: 6px;
+    min-width: 190px;
+    box-shadow: 0 12px 32px rgba(0,0,0,0.45);
+    display: none;
+    z-index: 60;
+  }
+  .lang-menu.open { display: block; }
+
+  .lang-option {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 9px 12px;
+    border-radius: 6px;
+    font-size: 13.5px;
+    color: #d8d8de;
+    cursor: pointer;
+    background: none;
+    border: none;
+    width: 100%;
+    text-align: left;
+    font-family: inherit;
+  }
+  .lang-option:hover { background: #2a2a34; }
+  .lang-option .check { color: var(--accent); font-size: 12px; visibility: hidden; }
+  .lang-option.active .check { visibility: visible; }
+
+  .footer-bottom {
+    padding: 26px 0 30px;
     display: flex;
     justify-content: space-between;
     align-items: center;
     flex-wrap: wrap;
-    gap: 16px;
+    gap: 18px;
   }
 
-  .footer-links { display: flex; gap: 22px; font-size: 13px; color: var(--text-secondary); }
-  .footer-links a { text-decoration: none; }
-  .footer-links a:hover { color: var(--text); }
+  .footer-brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .footer-brand img { height: 46px; width: auto; }
+  .footer-brand-text { font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 19px; color: #fff; }
 
-  .footer-copy { font-size: 12px; color: var(--text-secondary); }
+  .footer-meta { font-size: 12.5px; color: #8b8b96; line-height: 1.6; }
+  .footer-meta a { color: #9db8d8; text-decoration: underline; }
+
+  .footer-social { display: flex; gap: 10px; }
+  .footer-social a {
+    width: 34px; height: 34px; border-radius: 50%;
+    background: #23232c; display: flex; align-items: center; justify-content: center;
+    color: #d8d8de; text-decoration: none; font-size: 14px;
+  }
+  .footer-social a:hover { background: #2f2f3a; }
+
+  .footer-legal-row {
+    border-top: 1px solid #2a2a33;
+    padding: 16px 0;
+    font-size: 12px;
+    color: #6f6f7a;
+    text-align: center;
+  }
 
   @media (max-width: 860px) {
     .hero { grid-template-columns: 1fr; padding-top: 56px; text-align: center; }
@@ -497,6 +635,8 @@
     .download-grid, .donate-grid { grid-template-columns: 1fr; }
     nav.links { display: none; }
     .hero h1 { font-size: 34px; }
+    .reqs-grid { grid-template-columns: 90px 1fr 1fr; }
+    .reqs-grid > div { padding: 12px 10px; font-size: 12px; }
   }
 </style>
 </head>
@@ -509,34 +649,33 @@
         ElsEvo
       </div>
       <nav class="links">
-        <a href="#recursos">Recursos</a>
-        <a href="#download">Download</a>
-        <a href="#apoie">Apoiar</a>
+        <a href="#recursos" data-i18n="navRecursos">Recursos</a>
+        <a href="#download" data-i18n="navDownload">Download</a>
+        <a href="#apoie" data-i18n="navApoiar">Apoiar</a>
         <a href="https://github.com/AyameJk/ElsEvo" target="_blank" rel="noopener">GitHub</a>
       </nav>
       <div class="nav-actions">
         <button class="theme-toggle" id="themeToggle" aria-label="Alternar tema" title="Alternar tema">🌙</button>
-        <a href="#download" class="btn btn-primary">Baixar</a>
       </div>
     </div>
   </header>
 
   <section class="hero wrap">
     <div>
-      <div class="eyebrow">● gratuito &amp; open-source</div>
-      <h1>Mods do Elsword,<br>sem <span>complicação</span>.</h1>
-      <p class="lead">
+      <div class="eyebrow" data-i18n="heroEyebrow">● gratuito &amp; open-source</div>
+      <h1 data-i18n="heroTitle">Mods do Elsword,<br>sem <span>complicação</span>.</h1>
+      <p class="lead" data-i18n="heroLead">
         O ElsEvo troca os arquivos do jogo pelos seus mods, faz backup automático e
         restaura tudo sozinho quando você fecha o cliente. Sem editar pasta nenhuma
         na mão.
       </p>
       <div class="hero-ctas">
-        <a href="#download" class="btn btn-primary">⬇ Baixar ElsEvo</a>
-        <a href="https://github.com/AyameJk/ElsEvo" target="_blank" rel="noopener" class="btn btn-ghost">Ver código-fonte</a>
+        <a href="#download" class="btn btn-primary" data-i18n="heroBtnBaixar">⬇ Baixar ElsEvo</a>
+        <a href="https://github.com/AyameJk/ElsEvo" target="_blank" rel="noopener" class="btn btn-ghost" data-i18n="heroBtnCodigo">Ver código-fonte</a>
       </div>
       <div class="hero-note">
         <span class="mono" style="color: var(--success-text);">v1.0</span>
-        <span>· Windows 10/11 · .NET 8</span>
+        <span data-i18n="heroNoteSpecs">· Windows 10/11 · .NET 8</span>
       </div>
     </div>
 
@@ -547,15 +686,15 @@
           <div class="mock-dots"><span></span><span></span><span></span></div>
         </div>
         <div class="mock-body">
-          <div class="mock-badge-row"><span class="mock-badge">LIGADO</span></div>
-          <div class="mock-label">Mods ativos</div>
+          <div class="mock-badge-row"><span class="mock-badge" data-i18n="mockLigado">LIGADO</span></div>
+          <div class="mock-label" data-i18n="mockModsAtivos">Mods ativos</div>
           <div class="mock-list">
             <div class="mock-list-item">VozesPT-BR (12 arquivos)</div>
             <div class="mock-list-item">UI Retro</div>
             <div class="mock-list-item">TrilhaSonoraClassica</div>
           </div>
-          <div class="mock-btn-secondary">Gerenciar Mods</div>
-          <div class="mock-btn-primary">Aplicar e Jogar</div>
+          <div class="mock-btn-secondary" data-i18n="mockGerenciar">Gerenciar Mods</div>
+          <div class="mock-btn-primary" data-i18n="mockAplicar">Aplicar e Jogar</div>
         </div>
       </div>
     </div>
@@ -564,30 +703,30 @@
   <section id="recursos" class="divider">
     <div class="wrap">
       <div class="section-head">
-        <div class="eyebrow">recursos</div>
-        <h2>Feito pra quem só quer jogar</h2>
-        <p>Cada detalhe do ElsEvo existe pra evitar que você mexa em arquivo do jogo na mão.</p>
+        <div class="eyebrow" data-i18n="recursosEyebrow">recursos</div>
+        <h2 data-i18n="recursosTitle">Feito pra quem só quer jogar</h2>
+        <p data-i18n="recursosLead">Cada detalhe do ElsEvo existe pra evitar que você mexa em arquivo do jogo na mão.</p>
       </div>
       <div class="features">
         <div class="feature-card">
           <div class="ic">🧩</div>
-          <h3>Gerenciamento de mods</h3>
-          <p>Importe pastas ou .zip, organize por categoria (Geral/BGM/Vídeo) e ative com um clique.</p>
+          <h3 data-i18n="featMods">Gerenciamento de mods</h3>
+          <p data-i18n="featModsDesc">Importe pastas ou .zip, organize por categoria (Geral/BGM/Vídeo) e ative com um clique.</p>
         </div>
         <div class="feature-card">
           <div class="ic">🛟</div>
-          <h3>Backup automático</h3>
-          <p>Os arquivos originais voltam sozinhos assim que você fecha o jogo — nunca fica sujo.</p>
+          <h3 data-i18n="featBackup">Backup automático</h3>
+          <p data-i18n="featBackupDesc">Os arquivos originais voltam sozinhos assim que você fecha o jogo — nunca fica sujo.</p>
         </div>
         <div class="feature-card">
           <div class="ic">🔄</div>
-          <h3>Auto-atualização</h3>
-          <p>O app se atualiza sozinho, com notas de lançamento e instalação silenciosa.</p>
+          <h3 data-i18n="featUpdate">Auto-atualização</h3>
+          <p data-i18n="featUpdateDesc">O app se atualiza sozinho, com notas de lançamento e instalação silenciosa.</p>
         </div>
         <div class="feature-card">
           <div class="ic">🎨</div>
-          <h3>Tema &amp; idioma</h3>
-          <p>Claro ou escuro, em Português, Inglês ou Chinês — do jeito que for melhor pra você.</p>
+          <h3 data-i18n="featTema">Tema &amp; idioma</h3>
+          <p data-i18n="featTemaDesc">Claro ou escuro, em Português, Inglês ou Chinês — do jeito que for melhor pra você.</p>
         </div>
       </div>
     </div>
@@ -596,34 +735,59 @@
   <section id="download" class="divider">
     <div class="wrap">
       <div class="section-head">
-        <div class="eyebrow">download</div>
-        <h2>Escolha seu canal</h2>
-        <p>Estável é o recomendado pro dia a dia. Beta traz novidades antes, mas pode ter bugs.</p>
+        <div class="eyebrow" data-i18n="downloadEyebrow">download</div>
+        <h2 data-i18n="downloadTitle">Escolha seu canal</h2>
+        <p data-i18n="downloadLead">Estável é o recomendado pro dia a dia. Beta traz novidades antes, mas pode ter bugs.</p>
       </div>
 
       <div class="download-grid">
         <div class="channel-card">
-          <span class="channel-tag stable">CANAL ESTÁVEL</span>
+          <span class="channel-tag stable" data-i18n="tagEstavel">CANAL ESTÁVEL</span>
           <h3>ElsEvo</h3>
-          <p>Versão testada e recomendada para a maioria dos jogadores. Atualizações menos frequentes, mais estabilidade.</p>
-          <a href="https://github.com/AyameJk/ElsEvo/releases/latest" target="_blank" rel="noopener" class="btn btn-primary">⬇ Baixar versão estável</a>
+          <p data-i18n="canalEstavelDesc">Versão testada e recomendada para a maioria dos jogadores. Atualizações menos frequentes, mais estabilidade.</p>
+          <a href="https://github.com/AyameJk/ElsEvo/releases/latest" target="_blank" rel="noopener" class="btn btn-primary" data-i18n="btnBaixarEstavel">⬇ Baixar versão estável</a>
         </div>
         <div class="channel-card beta">
-          <span class="channel-tag beta">CANAL BETA</span>
+          <span class="channel-tag beta" data-i18n="tagBeta">CANAL BETA</span>
           <h3>ElsEvo Beta</h3>
-          <p>Recursos novos chegam primeiro aqui. Pode ter instabilidades — ideal pra quem quer testar e reportar bugs.</p>
-          <a href="https://github.com/AyameJk/ElsEvoBeta/releases/latest" target="_blank" rel="noopener" class="btn" style="width:100%; justify-content:center; background: var(--beta-border); color:#fff;">⬇ Baixar versão beta</a>
+          <p data-i18n="canalBetaDesc">Recursos novos chegam primeiro aqui. Pode ter instabilidades — ideal pra quem quer testar e reportar bugs.</p>
+          <a href="https://github.com/AyameJk/ElsEvoBeta/releases/latest" target="_blank" rel="noopener" class="btn" style="width:100%; justify-content:center; background: var(--beta-border); color:#fff;" data-i18n="btnBaixarBeta">⬇ Baixar versão beta</a>
         </div>
       </div>
 
       <div class="smartscreen-note">
         <span>⚠️</span>
-        <span>
+        <span data-i18n="smartscreenNote">
           <strong>Aviso:</strong> como o instalador não é assinado digitalmente, o Windows
           SmartScreen ou seu antivírus pode exibir um alerta durante o download ou a
           instalação. Isso é esperado para projetos independentes — prossiga por sua conta,
           ou compile o app você mesmo a partir do código-fonte no GitHub.
         </span>
+      </div>
+
+      <div class="reqs-table">
+        <div class="reqs-title" data-i18n="reqsTitle">Requisitos do sistema</div>
+        <div class="reqs-grid">
+          <div class="reqs-head"></div>
+          <div class="reqs-head" data-i18n="reqsMinimo">MÍNIMO</div>
+          <div class="reqs-head" data-i18n="reqsRecomendado">RECOMENDADO</div>
+
+          <div class="reqs-label" data-i18n="reqsSo">Sistema Operacional</div>
+          <div class="reqs-value">Windows 10 / 11 (64-bit)</div>
+          <div class="reqs-value">Windows 10 / 11 (64-bit)</div>
+
+          <div class="reqs-label">CPU</div>
+          <div class="reqs-value" data-i18n="reqsCpuMin">Processador de 1.0 GHz (Intel/AMD)</div>
+          <div class="reqs-value" data-i18n="reqsCpuRec">Processador Dual-Core de 2.9 GHz ou superior (Intel/AMD)</div>
+
+          <div class="reqs-label" data-i18n="reqsRam">Memória RAM</div>
+          <div class="reqs-value">256 MB</div>
+          <div class="reqs-value">512 MB</div>
+
+          <div class="reqs-label" data-i18n="reqsArmazenamento">Armazenamento</div>
+          <div class="reqs-value" data-i18n="reqsArmMin">512 MB de espaço disponível</div>
+          <div class="reqs-value" data-i18n="reqsArmRec">1 GB de espaço disponível</div>
+        </div>
       </div>
     </div>
   </section>
@@ -631,9 +795,9 @@
   <section id="apoie" class="divider">
     <div class="wrap">
       <div class="section-head">
-        <div class="eyebrow">apoie o projeto</div>
-        <h2>Gostou do ElsEvo?</h2>
-        <p>O projeto é gratuito e sem anúncios. Se quiser ajudar a manter o desenvolvimento, qualquer valor é bem-vindo.</p>
+        <div class="eyebrow" data-i18n="apoieEyebrow">apoie o projeto</div>
+        <h2 data-i18n="apoieTitle">Gostou do ElsEvo?</h2>
+        <p data-i18n="apoieLead">O projeto é gratuito e sem anúncios. Se quiser ajudar a manter o desenvolvimento, qualquer valor é bem-vindo.</p>
       </div>
 
       <div class="donate-grid">
@@ -651,9 +815,9 @@
 
           <div class="pix-key">
             <span id="pixKey">da83c196-7a9d-4183-bfee-3ced2b5340bf</span>
-            <button class="copy-btn" onclick="copiarPix()">Copiar</button>
+            <button class="copy-btn" onclick="copiarPix()" data-i18n="copyBtn">Copiar</button>
           </div>
-          <div class="hint">Chave aleatória — não identifica dados pessoais.</div>
+          <div class="hint" data-i18n="pixHint">Chave aleatória — não identifica dados pessoais.</div>
         </div>
 
         <div class="donate-card">
@@ -661,30 +825,209 @@
             <img src="assets/paypal-icon.png" alt="" style="height:200px; width:auto; object-fit:contain;">
             <img src="assets/paypal-wordmark.png" alt="PayPal" style="height:100px; width:auto; object-fit:contain;">
           </div>
-          <p style="color: var(--text-secondary); font-size: 13.5px; margin: 0 0 16px;">Prefere internacional? Doe direto por PayPal.</p>
-          <a href="https://www.paypal.com/donate?business=SEU-EMAIL-PAYPAL-AQUI&currency_code=BRL" target="_blank" rel="noopener" class="btn btn-primary" style="width:100%; justify-content:center; background:#0070ba;">Doar via PayPal</a>
-          <div class="hint">Você será redirecionado pro site oficial do PayPal.</div>
+          <p style="color: var(--text-secondary); font-size: 13.5px; margin: 0 0 16px;" data-i18n="paypalDesc">Prefere internacional? Doe direto por PayPal.</p>
+          <a href="https://www.paypal.com/donate?business=ayamej157@gmail.com&currency_code=BRL" target="_blank" rel="noopener" class="btn btn-primary" style="width:100%; justify-content:center; background:#0070ba;" data-i18n="paypalBtn">Doar via PayPal</a>
+          <div class="hint" data-i18n="paypalHint">Você será redirecionado pro site oficial do PayPal.</div>
         </div>
       </div>
     </div>
   </section>
 
   <footer>
-    <div class="wrap footer-inner">
-      <div class="brand" style="font-size: 14px;">
-        <img src="assets/ElsEvo_logo.png" alt="ElsEvo" class="brand-logo" style="height:22px; width:auto;">
-        ElsEvo
+    <div class="wrap footer-top">
+      <div class="footer-links-top">
+        <a href="https://github.com/AyameJk/ElsEvo" target="_blank" rel="noopener" data-i18n="footGithub">GitHub</a>
+        <a href="https://github.com/AyameJk/ElsEvo/releases" target="_blank" rel="noopener" data-i18n="footChangelog">Changelog</a>
+        <a href="https://github.com/AyameJk/ElsEvo/issues" target="_blank" rel="noopener" data-i18n="footBug">Reportar bug</a>
+        <a href="#apoie" data-i18n="footApoiar">Apoiar</a>
       </div>
-      <div class="footer-links">
-        <a href="https://github.com/AyameJk/ElsEvo" target="_blank" rel="noopener">GitHub</a>
-        <a href="https://github.com/AyameJk/ElsEvo/releases" target="_blank" rel="noopener">Changelog</a>
-        <a href="https://github.com/AyameJk/ElsEvo/issues" target="_blank" rel="noopener">Reportar bug</a>
+      <div class="lang-wrap">
+        <button class="lang-select" id="langSelect">
+          <span>🌐</span>
+          <span id="langLabel">Português (Brasil)</span>
+          <span>▾</span>
+        </button>
+        <div class="lang-menu" id="langMenu">
+          <button class="lang-option active" data-lang="pt">Português (Brasil) <span class="check">✓</span></button>
+          <button class="lang-option" data-lang="en">English <span class="check">✓</span></button>
+          <button class="lang-option" data-lang="zh">中文 <span class="check">✓</span></button>
+        </div>
       </div>
-      <div class="footer-copy">Feito por AyameJk · Projeto de fã, sem vínculo com a KOG Games.</div>
+    </div>
+
+    <div class="wrap footer-bottom">
+      <div class="footer-brand">
+        <img src="assets/ElsEvo_logo.png" alt="ElsEvo">
+        <span class="footer-brand-text">ElsEvo</span>
+      </div>
+
+      <div class="footer-meta" data-i18n="footMeta">
+        © 2026 AyameJk. Projeto de fã, sem vínculo com a KOG Games.<br>
+        Elsword e suas marcas pertencem aos seus respectivos donos.
+      </div>
+
+      <div class="footer-social">
+        <a href="https://github.com/AyameJk/ElsEvo" target="_blank" rel="noopener" aria-label="GitHub">🐙</a>
+      </div>
+    </div>
+
+    <div class="footer-legal-row" data-i18n="footLegal">
+      ElsEvo não possui vínculo oficial com a KOG Games ou com o Elsword. Projeto independente, feito por fãs.
     </div>
   </footer>
 
   <script>
+    // ===== Traduções PT / EN / ZH =====
+    const traducoes = {
+      pt: {
+        navRecursos: "Recursos", navDownload: "Download", navApoiar: "Apoiar", navBaixar: "Baixar",
+        heroEyebrow: "● gratuito &amp; open-source",
+        heroTitle: 'Mods do Elsword,<br>sem <span>complicação</span>.',
+        heroLead: "O ElsEvo troca os arquivos do jogo pelos seus mods, faz backup automático e restaura tudo sozinho quando você fecha o cliente. Sem editar pasta nenhuma na mão.",
+        heroBtnBaixar: "⬇ Baixar ElsEvo", heroBtnCodigo: "Ver código-fonte", heroNoteSpecs: "· Windows 10/11 · .NET 8",
+        mockLigado: "LIGADO", mockModsAtivos: "Mods ativos", mockGerenciar: "Gerenciar Mods", mockAplicar: "Aplicar e Jogar",
+        recursosEyebrow: "recursos", recursosTitle: "Feito pra quem só quer jogar",
+        recursosLead: "Cada detalhe do ElsEvo existe pra evitar que você mexa em arquivo do jogo na mão.",
+        featMods: "Gerenciamento de mods", featModsDesc: "Importe pastas ou .zip, organize por categoria (Geral/BGM/Vídeo) e ative com um clique.",
+        featBackup: "Backup automático", featBackupDesc: "Os arquivos originais voltam sozinhos assim que você fecha o jogo — nunca fica sujo.",
+        featUpdate: "Auto-atualização", featUpdateDesc: "O app se atualiza sozinho, com notas de lançamento e instalação silenciosa.",
+        featTema: "Tema &amp; idioma", featTemaDesc: "Claro ou escuro, em Português, Inglês ou Chinês — do jeito que for melhor pra você.",
+        downloadEyebrow: "download", downloadTitle: "Escolha seu canal",
+        downloadLead: "Estável é o recomendado pro dia a dia. Beta traz novidades antes, mas pode ter bugs.",
+        tagEstavel: "CANAL ESTÁVEL", tagBeta: "CANAL BETA",
+        canalEstavelDesc: "Versão testada e recomendada para a maioria dos jogadores. Atualizações menos frequentes, mais estabilidade.",
+        canalBetaDesc: "Recursos novos chegam primeiro aqui. Pode ter instabilidades — ideal pra quem quer testar e reportar bugs.",
+        btnBaixarEstavel: "⬇ Baixar versão estável", btnBaixarBeta: "⬇ Baixar versão beta",
+        smartscreenNote: "<strong>Aviso:</strong> como o instalador não é assinado digitalmente, o Windows SmartScreen ou seu antivírus pode exibir um alerta durante o download ou a instalação. Isso é esperado para projetos independentes — prossiga por sua conta, ou compile o app você mesmo a partir do código-fonte no GitHub.",
+        reqsTitle: "Requisitos do sistema", reqsMinimo: "MÍNIMO", reqsRecomendado: "RECOMENDADO",
+        reqsSo: "Sistema Operacional", reqsRam: "Memória RAM", reqsArmazenamento: "Armazenamento",
+        reqsCpuMin: "Processador de 1.0 GHz (Intel/AMD)", reqsCpuRec: "Processador Dual-Core de 2.9 GHz ou superior (Intel/AMD)",
+        reqsArmMin: "512 MB de espaço disponível", reqsArmRec: "1 GB de espaço disponível",
+        apoieEyebrow: "apoie o projeto", apoieTitle: "Gostou do ElsEvo?",
+        apoieLead: "O projeto é gratuito e sem anúncios. Se quiser ajudar a manter o desenvolvimento, qualquer valor é bem-vindo.",
+        pixDesc: "Escaneie o QR Code ou copie a chave abaixo no app do seu banco.", copyBtn: "Copiar",
+        pixHint: "Chave aleatória — não identifica dados pessoais.",
+        paypalDesc: "Prefere internacional? Doe direto por PayPal.", paypalBtn: "Doar via PayPal",
+        paypalHint: "Você será redirecionado pro site oficial do PayPal.",
+        footGithub: "GitHub", footChangelog: "Changelog", footBug: "Reportar bug", footApoiar: "Apoiar",
+        footMeta: "© 2026 AyameJk. Projeto de fã, sem vínculo com a KOG Games.<br>Elsword e suas marcas pertencem aos seus respectivos donos.",
+        footLegal: "ElsEvo não possui vínculo oficial com a KOG Games ou com o Elsword. Projeto independente, feito por fãs.",
+        langLabel: "Português (Brasil)"
+      },
+      en: {
+        navRecursos: "Features", navDownload: "Download", navApoiar: "Support", navBaixar: "Download",
+        heroEyebrow: "● free &amp; open-source",
+        heroTitle: 'Elsword mods,<br>without the <span>hassle</span>.',
+        heroLead: "ElsEvo swaps the game files for your mods, backs them up automatically, and restores everything on its own when you close the client. No manual folder editing.",
+        heroBtnBaixar: "⬇ Download ElsEvo", heroBtnCodigo: "View source code", heroNoteSpecs: "· Windows 10/11 · .NET 8",
+        mockLigado: "ON", mockModsAtivos: "Active mods", mockGerenciar: "Manage Mods", mockAplicar: "Apply and Play",
+        recursosEyebrow: "features", recursosTitle: "Built for people who just want to play",
+        recursosLead: "Every detail of ElsEvo exists so you never have to touch a game file by hand.",
+        featMods: "Mod management", featModsDesc: "Import folders or .zip files, organize by category (General/BGM/Video), and enable with one click.",
+        featBackup: "Automatic backup", featBackupDesc: "Original files come back on their own as soon as you close the game — never leaves a mess.",
+        featUpdate: "Auto-update", featUpdateDesc: "The app updates itself, with release notes and silent installation.",
+        featTema: "Theme &amp; language", featTemaDesc: "Light or dark, in Portuguese, English, or Chinese — whichever suits you best.",
+        downloadEyebrow: "download", downloadTitle: "Choose your channel",
+        downloadLead: "Stable is recommended for everyday use. Beta gets new features first, but may have bugs.",
+        tagEstavel: "STABLE CHANNEL", tagBeta: "BETA CHANNEL",
+        canalEstavelDesc: "Tested version recommended for most players. Less frequent updates, more stability.",
+        canalBetaDesc: "New features land here first. May be unstable — ideal for testing and reporting bugs.",
+        btnBaixarEstavel: "⬇ Download stable", btnBaixarBeta: "⬇ Download beta",
+        smartscreenNote: "<strong>Notice:</strong> since the installer isn't digitally signed, Windows SmartScreen or your antivirus may show a warning during download or installation. This is expected for independent projects — proceed at your discretion, or build the app yourself from the source code on GitHub.",
+        reqsTitle: "System requirements", reqsMinimo: "MINIMUM", reqsRecomendado: "RECOMMENDED",
+        reqsSo: "Operating System", reqsRam: "RAM", reqsArmazenamento: "Storage",
+        reqsCpuMin: "Dual-Core Processor at 2.9 GHz (Intel/AMD)", reqsCpuRec: "Quad-Core Processor at 3.0 GHz or higher",
+        reqsArmMin: "512 MB available space", reqsArmRec: "1 GB available space",
+        apoieEyebrow: "support the project", apoieTitle: "Enjoying ElsEvo?",
+        apoieLead: "The project is free and ad-free. If you'd like to help keep development going, any amount is welcome.",
+        pixDesc: "Scan the QR Code or copy the key below in your bank's app.", copyBtn: "Copy",
+        pixHint: "Random key — doesn't reveal personal data.",
+        paypalDesc: "Prefer an international option? Donate directly via PayPal.", paypalBtn: "Donate via PayPal",
+        paypalHint: "You'll be redirected to PayPal's official site.",
+        footGithub: "GitHub", footChangelog: "Changelog", footBug: "Report a bug", footApoiar: "Support",
+        footMeta: "© 2026 AyameJk. Fan project, not affiliated with KOG Games.<br>Elsword and its trademarks belong to their respective owners.",
+        footLegal: "ElsEvo has no official affiliation with KOG Games or Elsword. Independent, fan-made project.",
+        langLabel: "English"
+      },
+      zh: {
+        navRecursos: "功能", navDownload: "下载", navApoiar: "支持", navBaixar: "下载",
+        heroEyebrow: "● 免费 &amp; 开源",
+        heroTitle: 'Elsword 模组,<br>不再<span>麻烦</span>。',
+        heroLead: "ElsEvo 会替换游戏文件为你的模组,自动备份,并在你关闭客户端时自动还原一切。无需手动编辑任何文件夹。",
+        heroBtnBaixar: "⬇ 下载 ElsEvo", heroBtnCodigo: "查看源代码", heroNoteSpecs: "· Windows 10/11 · .NET 8",
+        mockLigado: "已开启", mockModsAtivos: "已启用的模组", mockGerenciar: "管理模组", mockAplicar: "应用并游玩",
+        recursosEyebrow: "功能", recursosTitle: "只为想安心游玩的你而做",
+        recursosLead: "ElsEvo 的每个细节都是为了让你永远不用手动修改游戏文件。",
+        featMods: "模组管理", featModsDesc: "导入文件夹或 .zip,按类别(常规/背景音乐/视频)整理,一键启用。",
+        featBackup: "自动备份", featBackupDesc: "关闭游戏后原始文件会自动还原 —— 绝不留下残留。",
+        featUpdate: "自动更新", featUpdateDesc: "应用会自动更新,附带更新说明与静默安装。",
+        featTema: "主题与语言", featTemaDesc: "浅色或深色主题,支持葡萄牙语、英语或中文 —— 随你喜欢。",
+        downloadEyebrow: "下载", downloadTitle: "选择你的版本",
+        downloadLead: "稳定版推荐日常使用。测试版会更早获得新功能,但可能存在漏洞。",
+        tagEstavel: "稳定版", tagBeta: "测试版",
+        canalEstavelDesc: "经过测试,推荐大多数玩家使用。更新频率较低,更稳定。",
+        canalBetaDesc: "新功能会最先出现在这里。可能不稳定 —— 适合测试并反馈漏洞。",
+        btnBaixarEstavel: "⬇ 下载稳定版", btnBaixarBeta: "⬇ 下载测试版",
+        smartscreenNote: "<strong>提示:</strong>由于安装程序未进行数字签名,Windows SmartScreen 或您的杀毒软件可能会在下载或安装过程中显示警告。这对独立项目来说是正常现象 —— 请自行判断是否继续,或从 GitHub 上的源代码自行编译应用。",
+        reqsTitle: "系统要求", reqsMinimo: "最低配置", reqsRecomendado: "推荐配置",
+        reqsSo: "操作系统", reqsRam: "内存", reqsArmazenamento: "存储空间",
+        reqsCpuMin: "双核处理器 2.9 GHz(Intel/AMD)", reqsCpuRec: "四核处理器 3.0 GHz 或更高",
+        reqsArmMin: "512 MB 可用空间", reqsArmRec: "1 GB 可用空间",
+        apoieEyebrow: "支持项目", apoieTitle: "喜欢 ElsEvo 吗?",
+        apoieLead: "该项目免费且无广告。如果你想帮助维持开发,欢迎任意金额的支持。",
+        pixDesc: "扫描二维码或在您的银行应用中复制下方密钥。", copyBtn: "复制",
+        pixHint: "随机密钥 —— 不会暴露个人数据。",
+        paypalDesc: "偏好国际方式?直接通过 PayPal 捐赠。", paypalBtn: "通过 PayPal 捐赠",
+        paypalHint: "您将被重定向到 PayPal 官方网站。",
+        footGithub: "GitHub", footChangelog: "更新日志", footBug: "报告漏洞", footApoiar: "支持",
+        footMeta: "© 2026 AyameJk。粉丝项目,与 KOG Games 无关。<br>Elsword 及其商标归其各自所有者所有。",
+        footLegal: "ElsEvo 与 KOG Games 或 Elsword 没有官方关联。这是一个独立的粉丝制作项目。",
+        langLabel: "中文"
+      }
+    };
+
+    const ordemIdiomas = ["pt", "en", "zh"];
+
+    function aplicarIdioma(codigo) {
+      const dic = traducoes[codigo];
+      if (!dic) return;
+
+      document.querySelectorAll('[data-i18n]').forEach(el => {
+        const chave = el.getAttribute('data-i18n');
+        if (dic[chave] !== undefined) el.innerHTML = dic[chave];
+      });
+
+      document.getElementById('langLabel').textContent = dic.langLabel;
+      document.documentElement.lang = codigo === 'pt' ? 'pt-BR' : (codigo === 'zh' ? 'zh-CN' : 'en');
+      localStorage.setItem('elsevo-idioma', codigo);
+    }
+
+    const idiomaSalvo = localStorage.getItem('elsevo-idioma') || 'pt';
+    aplicarIdioma(idiomaSalvo);
+    document.querySelectorAll('.lang-option').forEach(o => {
+      o.classList.toggle('active', o.getAttribute('data-lang') === idiomaSalvo);
+    });
+
+    document.getElementById('langSelect').addEventListener('click', (e) => {
+      e.stopPropagation();
+      document.getElementById('langMenu').classList.toggle('open');
+    });
+
+    document.querySelectorAll('.lang-option').forEach(opt => {
+      opt.addEventListener('click', () => {
+        const codigo = opt.getAttribute('data-lang');
+        aplicarIdioma(codigo);
+        document.querySelectorAll('.lang-option').forEach(o => o.classList.remove('active'));
+        opt.classList.add('active');
+        document.getElementById('langMenu').classList.remove('open');
+      });
+    });
+
+    document.addEventListener('click', (e) => {
+      const menu = document.getElementById('langMenu');
+      if (!e.target.closest('.lang-wrap')) menu.classList.remove('open');
+    });
+
     // ===== Tema claro/escuro — espelha as mesmas cores do ThemeManager.cs do app =====
     const body = document.body;
     const toggleBtn = document.getElementById('themeToggle');
