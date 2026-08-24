@@ -762,7 +762,7 @@
           <span class="channel-tag beta" data-i18n="tagBeta">CANAL BETA</span>
           <h3>ElsEvo Beta</h3>
           <p data-i18n="canalBetaDesc">Recursos novos chegam primeiro aqui. Pode ter instabilidades — ideal pra quem quer testar e reportar bugs.</p>
-          <a href="https://github.com/AyameJk/ElsEvoBeta/releases/latest/download/ElsEvo-Setup.exe" target="_blank" rel="noopener" class="btn" style="width:100%; justify-content:center; background: var(--beta-border); color:#fff;" data-i18n="btnBaixarBeta">⬇ Baixar versão beta</a>
+          <a href="https://github.com/AyameJk/ElsEvoBeta/releases" id="btnBaixarBeta" target="_blank" rel="noopener" class="btn" style="width:100%; justify-content:center; background: var(--beta-border); color:#fff;" data-i18n="btnBaixarBeta">⬇ Baixar versão beta</a>
         </div>
       </div>
 
@@ -1058,6 +1058,32 @@
     });
 
     // ===== Copiar chave Pix =====
+    // ===== Link do botão Beta: resolvido via API do GitHub =====
+    // O endpoint /releases/latest do GitHub ignora releases marcadas como
+    // "Pré-lançamento" — como o canal beta usa esse selo em todas as
+    // releases, esse endpoint sempre dá 404 lá. Por isso, pro botão beta,
+    // buscamos a lista de releases via API (que enxerga pré-lançamentos)
+    // e pegamos o asset ElsEvo-Setup.exe da primeira (mais recente).
+    // Se a busca falhar por qualquer motivo, o link cai de volta pra
+    // página normal de Releases (href original do <a>, definido no HTML).
+    (function resolverLinkBeta() {
+      const link = document.getElementById('btnBaixarBeta');
+      if (!link) return;
+
+      fetch('https://api.github.com/repos/AyameJk/ElsEvoBeta/releases')
+        .then(r => r.ok ? r.json() : Promise.reject(r.status))
+        .then(releases => {
+          const maisRecente = releases[0];
+          const asset = maisRecente?.assets?.find(a => a.name === 'ElsEvo-Setup.exe');
+          if (asset?.browser_download_url) {
+            link.href = asset.browser_download_url;
+          }
+        })
+        .catch(() => {
+          // mantém o href padrão (página de Releases) — já definido no HTML
+        });
+    })();
+
     function copiarPix() {
       const chave = document.getElementById('pixKey').textContent;
       navigator.clipboard.writeText(chave).then(() => {
