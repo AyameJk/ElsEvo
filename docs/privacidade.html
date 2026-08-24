@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Política de Privacidade — ElsEvo</title>
+<meta name="description" content="Política de privacidade do ElsEvo: o site e o aplicativo não coletam dados pessoais dos usuários.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #1e1e1e;
+    --card: #252526;
+    --field: #1e1e1e;
+    --border: #3f3f46;
+    --text: #e3e3e3;
+    --text-secondary: #858585;
+    --accent: #0078d4;
+    --accent-hover: #1387e8;
+    --shadow: 0 1px 0 rgba(255,255,255,0.03) inset, 0 12px 32px rgba(0,0,0,0.35);
+    --page-bg: #15141b;
+  }
+
+  [data-theme="claro"] {
+    --bg: #f3f3f3;
+    --card: #ffffff;
+    --field: #ffffff;
+    --border: #d0d0d0;
+    --text: #1a1a1a;
+    --text-secondary: #5a5a5a;
+    --shadow: 0 1px 0 rgba(0,0,0,0.02) inset, 0 12px 32px rgba(0,0,0,0.08);
+    --page-bg: #f3f3f3;
+  }
+
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    margin: 0;
+    background: var(--page-bg);
+    color: var(--text);
+    font-family: 'Inter', system-ui, sans-serif;
+    transition: background 0.25s ease, color 0.25s ease;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1, h2, .display {
+    font-family: 'Space Grotesk', 'Inter', sans-serif;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    margin: 0;
+  }
+
+  .mono { font-family: 'JetBrains Mono', monospace; }
+
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { color: var(--accent-hover); text-decoration: underline; }
+
+  .wrap {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+
+  /* ===== Navbar ===== */
+  header.nav {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: color-mix(in srgb, var(--page-bg) 80%, transparent);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .nav-inner {
+    max-width: 1080px;
+    margin: 0 auto;
+    padding: 0 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 76px;
+  }
+
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 700;
+    font-size: 19px;
+  }
+
+  .brand-logo {
+    height: 32px;
+    width: auto;
+  }
+
+  .back-link {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13.5px;
+    font-weight: 600;
+    color: var(--text-secondary);
+  }
+  .back-link:hover { color: var(--text); text-decoration: none; }
+
+  .nav-actions { display: flex; align-items: center; gap: 12px; }
+
+  .theme-toggle {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--card);
+    color: var(--text);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 15px;
+  }
+
+  .lang-wrap { position: relative; }
+
+  .lang-select {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 12px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--card);
+    color: var(--text);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  .lang-menu {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    box-shadow: var(--shadow);
+    min-width: 150px;
+    padding: 6px;
+    display: none;
+    z-index: 60;
+  }
+  .lang-menu.open { display: block; }
+
+  .lang-option {
+    display: block;
+    padding: 8px 10px;
+    border-radius: 6px;
+    font-size: 13.5px;
+    cursor: pointer;
+    color: var(--text-secondary);
+  }
+  .lang-option:hover { background: var(--field); color: var(--text); }
+  .lang-option.active { color: var(--accent); font-weight: 600; }
+
+  /* ===== Conteúdo ===== */
+  main { padding: 64px 0 100px; }
+
+  .eyebrow {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12.5px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 14px;
+    display: block;
+  }
+
+  h1.page-title {
+    font-size: clamp(30px, 4.5vw, 42px);
+    margin-bottom: 10px;
+  }
+
+  .updated {
+    color: var(--text-secondary);
+    font-size: 13.5px;
+    margin-bottom: 48px;
+  }
+
+  .summary-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 22px 24px;
+    margin-bottom: 40px;
+    box-shadow: var(--shadow);
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+  }
+
+  .summary-card .icon {
+    width: 34px;
+    height: 34px;
+    flex-shrink: 0;
+    border-radius: 9px;
+    background: linear-gradient(135deg, var(--accent), #63b3ed);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 17px;
+  }
+
+  .summary-card p {
+    margin: 0;
+    font-size: 14.5px;
+    line-height: 1.6;
+    color: var(--text);
+  }
+
+  section.policy-section {
+    margin-bottom: 36px;
+  }
+
+  section.policy-section h2 {
+    font-size: 19px;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+  }
+
+  section.policy-section h2 .num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    color: var(--accent);
+    font-weight: 600;
+  }
+
+  section.policy-section p, section.policy-section li {
+    font-size: 14.5px;
+    line-height: 1.7;
+    color: var(--text-secondary);
+  }
+
+  section.policy-section ul {
+    margin: 10px 0 0;
+    padding-left: 20px;
+  }
+
+  section.policy-section li { margin-bottom: 6px; }
+
+  section.policy-section strong { color: var(--text); font-weight: 600; }
+
+  code {
+    font-family: 'JetBrains Mono', monospace;
+    background: var(--field);
+    border: 1px solid var(--border);
+    padding: 2px 6px;
+    border-radius: 5px;
+    font-size: 12.5px;
+    color: var(--text);
+  }
+
+  .contact-box {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 22px 24px;
+    box-shadow: var(--shadow);
+  }
+
+  .contact-box h2 { font-size: 17px; margin-bottom: 10px; }
+  .contact-box p { font-size: 14px; color: var(--text-secondary); margin: 0 0 4px; }
+
+  footer.site-footer {
+    border-top: 1px solid var(--border);
+    padding: 28px 0;
+  }
+  footer.site-footer .wrap {
+    max-width: 1080px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  footer.site-footer p {
+    font-size: 12.5px;
+    color: var(--text-secondary);
+    margin: 0;
+  }
+
+  @media (max-width: 640px) {
+    .nav-inner { height: 64px; }
+    main { padding: 44px 0 70px; }
+    .back-link span.label { display: none; }
+  }
+</style>
+</head>
+<body data-theme="escuro">
+
+<header class="nav">
+  <div class="nav-inner">
+    <a class="brand" href="index.html" style="text-decoration:none;">
+      <img class="brand-logo" src="Assets/ElsEvo_logo.png" alt="ElsEvo">
+      <span>ElsEvo</span>
+    </a>
+
+    <a class="back-link" href="index.html">
+      ← <span class="label" data-i18n="voltar">Voltar ao site</span>
+    </a>
+
+    <div class="nav-actions">
+      <div class="lang-wrap">
+        <button class="lang-select" id="langSelect">
+          🌐 <span id="langLabel">Português (Brasil)</span> ▾
+        </button>
+        <div class="lang-menu" id="langMenu">
+          <span class="lang-option active" data-lang="pt">Português</span>
+          <span class="lang-option" data-lang="en">English</span>
+          <span class="lang-option" data-lang="zh">中文</span>
+        </div>
+      </div>
+      <button class="theme-toggle" id="themeToggle" aria-label="Alternar tema">🌙</button>
+    </div>
+  </div>
+</header>
+
+<main>
+  <div class="wrap">
+
+    <span class="eyebrow" data-i18n="eyebrow">privacidade</span>
+    <h1 class="page-title" data-i18n="titulo">Política de Privacidade</h1>
+    <p class="updated" data-i18n="atualizado">Última atualização: agosto de 2026</p>
+
+    <div class="summary-card">
+      <div class="icon">✓</div>
+      <p data-i18n="resumo">
+        Resumindo: <strong>o ElsEvo não coleta, armazena ou compartilha nenhum dado pessoal
+        seu.</strong> Nem o site, nem o aplicativo. Tudo o que o programa salva fica
+        apenas no seu próprio computador.
+      </p>
+    </div>
+
+    <section class="policy-section">
+      <h2><span class="num">01</span> <span data-i18n="s1Titulo">Sobre este documento</span></h2>
+      <p data-i18n="s1Texto">
+        Esta política se aplica ao site <code>ayamejk.github.io/ElsEvo</code> e ao
+        aplicativo <strong>ElsEvo</strong> (canais Estável e Beta), um gerenciador de mods
+        gratuito e de código aberto para o jogo Elsword, desenvolvido de forma independente
+        por um único desenvolvedor (AyameJk).
+      </p>
+    </section>
+
+    <section class="policy-section">
+      <h2><span class="num">02</span> <span data-i18n="s2Titulo">O site</span></h2>
+      <p data-i18n="s2Texto">
+        O site é uma página estática hospedada no GitHub Pages. Ele não possui formulários,
+        sistema de cadastro, cookies de rastreamento, pixels de anúncio ou qualquer script
+        de análise de comportamento (analytics). As únicas preferências salvas no seu
+        navegador (tema claro/escuro e idioma escolhido) ficam guardadas localmente via
+        <code>localStorage</code>, no seu próprio dispositivo — nunca são enviadas a
+        nenhum servidor.
+      </p>
+    </section>
+
+    <section class="policy-section">
+      <h2><span class="num">03</span> <span data-i18n="s3Titulo">O aplicativo</span></h2>
+      <p data-i18n="s3Texto">
+        O ElsEvo roda localmente no seu computador e não envia dados pessoais para nenhum
+        servidor. As únicas conexões de rede que o app faz são:
+      </p>
+      <ul>
+        <li data-i18n="s3Item1">
+          Verificar se existe uma nova versão disponível, consultando um arquivo público
+          de metadados no GitHub (sem enviar nenhuma informação sobre você ou sua máquina);
+        </li>
+        <li data-i18n="s3Item2">
+          Baixar o instalador de atualização diretamente do GitHub Releases, quando você
+          autoriza a atualização.
+        </li>
+      </ul>
+      <p data-i18n="s3Texto2">
+        Configurações do app (idioma, tema, caminho da pasta do jogo) e a lista de mods
+        ativos ficam salvas apenas localmente, na pasta <code>%LocalAppData%\ElsEvo\</code>
+        do seu próprio computador. Nada disso é enviado para fora da sua máquina.
+      </p>
+    </section>
+
+    <section class="policy-section">
+      <h2><span class="num">04</span> <span data-i18n="s4Titulo">Dados de terceiros</span></h2>
+      <p data-i18n="s4Texto">
+        O download do instalador é servido pela infraestrutura do GitHub (GitHub Releases),
+        que pode registrar dados técnicos padrão de acesso (como endereço IP), conforme a
+        própria política de privacidade do GitHub — o ElsEvo não tem acesso a esses dados e
+        não os utiliza.
+      </p>
+    </section>
+
+    <section class="policy-section">
+      <h2><span class="num">05</span> <span data-i18n="s5Titulo">Doações (Pix / PayPal)</span></h2>
+      <p data-i18n="s5Texto">
+        A seção de apoio ao projeto apenas exibe uma chave Pix e um link para o PayPal.
+        Nenhuma transação é processada pelo site — ao doar, você é redirecionado para o
+        aplicativo do seu banco ou para o site oficial do PayPal, que têm suas próprias
+        políticas de privacidade.
+      </p>
+    </section>
+
+    <section class="policy-section">
+      <h2><span class="num">06</span> <span data-i18n="s6Titulo">Alterações nesta política</span></h2>
+      <p data-i18n="s6Texto">
+        Caso esta política seja atualizada no futuro, a data no topo desta página será
+        revisada. Como o projeto não coleta contatos dos usuários, não há como notificar
+        individualmente — recomenda-se revisitar esta página periodicamente.
+      </p>
+    </section>
+
+    <div class="contact-box">
+      <h2 data-i18n="contatoTitulo">Contato</h2>
+      <p data-i18n="contatoTexto">Dúvidas sobre esta política podem ser enviadas para:</p>
+      <p><a href="mailto:victorjc20@outlook.com">victorjc20@outlook.com</a></p>
+      <p><a href="https://github.com/AyameJk/ElsEvo" target="_blank" rel="noopener">github.com/AyameJk/ElsEvo</a></p>
+    </div>
+
+  </div>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <p data-i18n="rodape">© 2026 AyameJk. Projeto de fã, sem vínculo com a KOG Games.</p>
+    <a class="back-link" href="index.html" data-i18n="voltar2">← Voltar ao site do ElsEvo</a>
+  </div>
+</footer>
+
+<script>
+  const traducoes = {
+    pt: {
+      voltar: "Voltar ao site", voltar2: "← Voltar ao site do ElsEvo",
+      eyebrow: "privacidade", titulo: "Política de Privacidade",
+      atualizado: "Última atualização: agosto de 2026",
+      resumo: "Resumindo: <strong>o ElsEvo não coleta, armazena ou compartilha nenhum dado pessoal seu.</strong> Nem o site, nem o aplicativo. Tudo o que o programa salva fica apenas no seu próprio computador.",
+      s1Titulo: "Sobre este documento",
+      s1Texto: "Esta política se aplica ao site <code>ayamejk.github.io/ElsEvo</code> e ao aplicativo <strong>ElsEvo</strong> (canais Estável e Beta), um gerenciador de mods gratuito e de código aberto para o jogo Elsword, desenvolvido de forma independente por um único desenvolvedor (AyameJk).",
+      s2Titulo: "O site",
+      s2Texto: "O site é uma página estática hospedada no GitHub Pages. Ele não possui formulários, sistema de cadastro, cookies de rastreamento, pixels de anúncio ou qualquer script de análise de comportamento (analytics). As únicas preferências salvas no seu navegador (tema claro/escuro e idioma escolhido) ficam guardadas localmente via <code>localStorage</code>, no seu próprio dispositivo — nunca são enviadas a nenhum servidor.",
+      s3Titulo: "O aplicativo",
+      s3Texto: "O ElsEvo roda localmente no seu computador e não envia dados pessoais para nenhum servidor. As únicas conexões de rede que o app faz são:",
+      s3Item1: "Verificar se existe uma nova versão disponível, consultando um arquivo público de metadados no GitHub (sem enviar nenhuma informação sobre você ou sua máquina);",
+      s3Item2: "Baixar o instalador de atualização diretamente do GitHub Releases, quando você autoriza a atualização.",
+      s3Texto2: "Configurações do app (idioma, tema, caminho da pasta do jogo) e a lista de mods ativos ficam salvas apenas localmente, na pasta <code>%LocalAppData%\\ElsEvo\\</code> do seu próprio computador. Nada disso é enviado para fora da sua máquina.",
+      s4Titulo: "Dados de terceiros",
+      s4Texto: "O download do instalador é servido pela infraestrutura do GitHub (GitHub Releases), que pode registrar dados técnicos padrão de acesso (como endereço IP), conforme a própria política de privacidade do GitHub — o ElsEvo não tem acesso a esses dados e não os utiliza.",
+      s5Titulo: "Doações (Pix / PayPal)",
+      s5Texto: "A seção de apoio ao projeto apenas exibe uma chave Pix e um link para o PayPal. Nenhuma transação é processada pelo site — ao doar, você é redirecionado para o aplicativo do seu banco ou para o site oficial do PayPal, que têm suas próprias políticas de privacidade.",
+      s6Titulo: "Alterações nesta política",
+      s6Texto: "Caso esta política seja atualizada no futuro, a data no topo desta página será revisada. Como o projeto não coleta contatos dos usuários, não há como notificar individualmente — recomenda-se revisitar esta página periodicamente.",
+      contatoTitulo: "Contato", contatoTexto: "Dúvidas sobre esta política podem ser enviadas para:",
+      rodape: "© 2026 AyameJk. Projeto de fã, sem vínculo com a KOG Games.",
+      langLabel: "Português (Brasil)"
+    },
+    en: {
+      voltar: "Back to site", voltar2: "← Back to ElsEvo",
+      eyebrow: "privacy", titulo: "Privacy Policy",
+      atualizado: "Last updated: August 2026",
+      resumo: "In short: <strong>ElsEvo does not collect, store, or share any of your personal data.</strong> Neither the website nor the app. Everything the program saves stays only on your own computer.",
+      s1Titulo: "About this document",
+      s1Texto: "This policy applies to the website <code>ayamejk.github.io/ElsEvo</code> and to the <strong>ElsEvo</strong> application (Stable and Beta channels), a free, open-source mod manager for the game Elsword, independently developed by a single developer (AyameJk).",
+      s2Titulo: "The website",
+      s2Texto: "The website is a static page hosted on GitHub Pages. It has no forms, sign-up system, tracking cookies, ad pixels, or any behavior-analytics script. The only preferences saved in your browser (light/dark theme and chosen language) are stored locally via <code>localStorage</code>, on your own device — they are never sent to any server.",
+      s3Titulo: "The application",
+      s3Texto: "ElsEvo runs locally on your computer and does not send personal data to any server. The only network connections the app makes are:",
+      s3Item1: "Checking whether a new version is available, by querying a public metadata file on GitHub (without sending any information about you or your machine);",
+      s3Item2: "Downloading the update installer directly from GitHub Releases, when you authorize the update.",
+      s3Texto2: "App settings (language, theme, game folder path) and the list of active mods are saved only locally, in the <code>%LocalAppData%\\ElsEvo\\</code> folder on your own computer. None of this is sent outside your machine.",
+      s4Titulo: "Third-party data",
+      s4Texto: "The installer download is served by GitHub's infrastructure (GitHub Releases), which may log standard technical access data (such as IP address) under GitHub's own privacy policy — ElsEvo has no access to that data and does not use it.",
+      s5Titulo: "Donations (Pix / PayPal)",
+      s5Texto: "The support section only displays a Pix key and a PayPal link. No transaction is processed by the website — when donating, you are redirected to your bank's app or to PayPal's official site, which have their own privacy policies.",
+      s6Titulo: "Changes to this policy",
+      s6Texto: "If this policy is updated in the future, the date at the top of this page will be revised. Since the project does not collect user contacts, there is no way to notify individuals — it is recommended to revisit this page periodically.",
+      contatoTitulo: "Contact", contatoTexto: "Questions about this policy can be sent to:",
+      rodape: "© 2026 AyameJk. Fan project, not affiliated with KOG Games.",
+      langLabel: "English"
+    },
+    zh: {
+      voltar: "返回网站", voltar2: "← 返回 ElsEvo 网站",
+      eyebrow: "隐私", titulo: "隐私政策",
+      atualizado: "最后更新:2026 年 8 月",
+      resumo: "简而言之:<strong>ElsEvo 不会收集、存储或分享您的任何个人数据。</strong>无论是网站还是应用程序都不会。程序保存的所有内容都只保留在您自己的电脑上。",
+      s1Titulo: "关于本文档",
+      s1Texto: "本政策适用于网站 <code>ayamejk.github.io/ElsEvo</code> 以及 <strong>ElsEvo</strong> 应用程序(稳定版与测试版渠道),这是一款免费、开源的 Elsword 模组管理工具,由独立开发者(AyameJk)一人开发。",
+      s2Titulo: "网站",
+      s2Texto: "本网站是托管在 GitHub Pages 上的静态页面。它没有表单、注册系统、跟踪 Cookie、广告像素或任何行为分析脚本。浏览器中保存的唯一偏好设置(浅色/深色主题及所选语言)通过 <code>localStorage</code> 保存在您自己的设备本地 —— 永远不会发送到任何服务器。",
+      s3Titulo: "应用程序",
+      s3Texto: "ElsEvo 在您的电脑上本地运行,不会向任何服务器发送个人数据。应用程序进行的唯一网络连接是:",
+      s3Item1: "通过查询 GitHub 上的一个公开元数据文件来检查是否有新版本(不会发送任何关于您或您设备的信息);",
+      s3Item2: "在您授权更新时,直接从 GitHub Releases 下载更新安装程序。",
+      s3Texto2: "应用设置(语言、主题、游戏文件夹路径)以及已启用的模组列表仅保存在您自己电脑本地的 <code>%LocalAppData%\\ElsEvo\\</code> 文件夹中。这些内容都不会发送到您的设备之外。",
+      s4Titulo: "第三方数据",
+      s4Texto: "安装程序的下载由 GitHub 的基础设施(GitHub Releases)提供,根据 GitHub 自身的隐私政策,可能会记录标准的技术访问数据(如 IP 地址)—— ElsEvo 无法访问这些数据,也不会使用它们。",
+      s5Titulo: "捐赠(Pix / PayPal)",
+      s5Texto: "支持项目的部分仅显示 Pix 密钥和 PayPal 链接。网站不处理任何交易 —— 捐赠时,您将被重定向到您的银行应用或 PayPal 官方网站,它们各自拥有自己的隐私政策。",
+      s6Titulo: "本政策的变更",
+      s6Texto: "如果未来更新本政策,本页顶部的日期将被修改。由于项目不收集用户联系方式,无法逐一通知 —— 建议您定期查看本页面。",
+      contatoTitulo: "联系方式", contatoTexto: "有关本政策的问题可发送至:",
+      rodape: "© 2026 AyameJk。粉丝项目,与 KOG Games 无关。",
+      langLabel: "中文"
+    }
+  };
+
+  function aplicarIdioma(codigo) {
+    const dic = traducoes[codigo];
+    if (!dic) return;
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+      const chave = el.getAttribute('data-i18n');
+      if (dic[chave] !== undefined) el.innerHTML = dic[chave];
+    });
+    document.getElementById('langLabel').textContent = dic.langLabel;
+    document.documentElement.lang = codigo === 'pt' ? 'pt-BR' : (codigo === 'zh' ? 'zh-CN' : 'en');
+    localStorage.setItem('elsevo-idioma', codigo);
+  }
+
+  const idiomaSalvo = localStorage.getItem('elsevo-idioma') || 'pt';
+  aplicarIdioma(idiomaSalvo);
+  document.querySelectorAll('.lang-option').forEach(o => {
+    o.classList.toggle('active', o.getAttribute('data-lang') === idiomaSalvo);
+  });
+
+  document.getElementById('langSelect').addEventListener('click', (e) => {
+    e.stopPropagation();
+    document.getElementById('langMenu').classList.toggle('open');
+  });
+
+  document.querySelectorAll('.lang-option').forEach(opt => {
+    opt.addEventListener('click', () => {
+      const codigo = opt.getAttribute('data-lang');
+      aplicarIdioma(codigo);
+      document.querySelectorAll('.lang-option').forEach(o => o.classList.remove('active'));
+      opt.classList.add('active');
+      document.getElementById('langMenu').classList.remove('open');
+    });
+  });
+
+  document.addEventListener('click', (e) => {
+    const menu = document.getElementById('langMenu');
+    if (!e.target.closest('.lang-wrap')) menu.classList.remove('open');
+  });
+
+  const body = document.body;
+  const toggleBtn = document.getElementById('themeToggle');
+
+  function aplicarTema(tema) {
+    body.setAttribute('data-theme', tema);
+    toggleBtn.textContent = tema === 'claro' ? '☀️' : '🌙';
+    localStorage.setItem('elsevo-tema', tema);
+  }
+
+  const temaSalvo = localStorage.getItem('elsevo-tema') || 'escuro';
+  aplicarTema(temaSalvo);
+
+  toggleBtn.addEventListener('click', () => {
+    const atual = body.getAttribute('data-theme');
+    aplicarTema(atual === 'escuro' ? 'claro' : 'escuro');
+  });
+</script>
+
+</body>
+</html>
