@@ -98,28 +98,63 @@
                             CornerRadius="6"
                             Padding="4">
                         <StackPanel Width="200">
-                            <Button Content="🆕 Novo"
-                                    Style="{StaticResource BotaoFlat}"
+                            <Button Style="{StaticResource BotaoFlat}"
                                     HorizontalContentAlignment="Left"
                                     Background="Transparent"
-                                    Click="MenuNovo_Click"/>
-                            <Button Content="📂 Importar pasta"
-                                    Style="{StaticResource BotaoFlat}"
+                                    Click="MenuNovo_Click">
+                                <StackPanel Orientation="Horizontal">
+                                    <Image Source="/Assets/menu-novo.png" Width="16" Height="16" Margin="0,0,8,0"/>
+                                    <TextBlock Text="Novo" VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </Button>
+                            <Button Style="{StaticResource BotaoFlat}"
                                     HorizontalContentAlignment="Left"
                                     Background="Transparent"
-                                    Click="MenuImportarPasta_Click"/>
-                            <Button Content="🗜️ Importar .zip"
-                                    Style="{StaticResource BotaoFlat}"
+                                    Click="MenuImportarPasta_Click">
+                                <StackPanel Orientation="Horizontal">
+                                    <Image Source="/Assets/menu-pasta.png" Width="16" Height="16" Margin="0,0,8,0"/>
+                                    <TextBlock Text="Importar pasta" VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </Button>
+                            <Button Style="{StaticResource BotaoFlat}"
                                     HorizontalContentAlignment="Left"
                                     Background="Transparent"
-                                    Click="MenuImportarZip_Click"/>
+                                    Click="MenuImportarZip_Click">
+                                <StackPanel Orientation="Horizontal">
+                                    <Image Source="/Assets/menu-zip.png" Width="16" Height="16" Margin="0,0,8,0"/>
+                                    <TextBlock Text="Importar .zip" VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </Button>
+                            <!-- Dois itens novos, portados do canal beta -->
+                            <Button Style="{StaticResource BotaoFlat}"
+                                    HorizontalContentAlignment="Left"
+                                    Background="Transparent"
+                                    Click="MenuAbrirNoExplorer_Click">
+                                <StackPanel Orientation="Horizontal">
+                                    <Image Source="/Assets/menu-pasta.png" Width="16" Height="16" Margin="0,0,8,0"/>
+                                    <TextBlock Text="Local do arquivo" VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </Button>
+                            <Button Style="{StaticResource BotaoFlat}"
+                                    HorizontalContentAlignment="Left"
+                                    Background="Transparent"
+                                    Click="MenuExportarZip_Click">
+                                <StackPanel Orientation="Horizontal">
+                                    <Image Source="/Assets/menu-exportar.png" Width="16" Height="16" Margin="0,0,8,0"/>
+                                    <TextBlock Text="Exportar para .zip" VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </Button>
                             <Separator/>
-                            <Button Content="🗑️ Excluir pack selecionado"
-                                    Style="{StaticResource BotaoFlat}"
+                            <Button Style="{StaticResource BotaoFlat}"
                                     HorizontalContentAlignment="Left"
                                     Background="Transparent"
                                     Foreground="#E36464"
-                                    Click="MenuExcluirPackSelecionado_Click"/>
+                                    Click="MenuExcluirPackSelecionado_Click">
+                                <StackPanel Orientation="Horizontal">
+                                    <Image Source="/Assets/menu-excluir.png" Width="16" Height="16" Margin="0,0,8,0"/>
+                                    <TextBlock Text="Excluir pack selecionado" VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </Button>
                         </StackPanel>
                     </Border>
                 </Popup>
@@ -137,9 +172,30 @@
                         Background="Transparent"
                         BorderThickness="0"
                         SelectionChanged="TabCategorias_SelectionChanged">
-                <TabItem x:Name="AbaGeral" Header="📄 Geral"/>
-                <TabItem x:Name="AbaBgm" Header="🎵 BGM"/>
-                <TabItem x:Name="AbaVideo" Header="🎬 Vídeo"/>
+                <TabItem x:Name="AbaGeral">
+                    <TabItem.Header>
+                        <StackPanel Orientation="Horizontal">
+                            <Image Source="/Assets/tab-geral.png" Width="16" Height="16" Margin="0,0,6,0"/>
+                            <TextBlock Text="Geral"/>
+                        </StackPanel>
+                    </TabItem.Header>
+                </TabItem>
+                <TabItem x:Name="AbaBgm">
+                    <TabItem.Header>
+                        <StackPanel Orientation="Horizontal">
+                            <Image Source="/Assets/tab-bgm.png" Width="16" Height="16" Margin="0,0,6,0"/>
+                            <TextBlock Text="BGM"/>
+                        </StackPanel>
+                    </TabItem.Header>
+                </TabItem>
+                <TabItem x:Name="AbaVideo">
+                    <TabItem.Header>
+                        <StackPanel Orientation="Horizontal">
+                            <Image Source="/Assets/tab-video.png" Width="16" Height="16" Margin="0,0,6,0"/>
+                            <TextBlock Text="Vídeo"/>
+                        </StackPanel>
+                    </TabItem.Header>
+                </TabItem>
             </TabControl>
 
             <TextBox x:Name="TxtPesquisa"

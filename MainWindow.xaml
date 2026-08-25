@@ -73,6 +73,10 @@
             </Setter>
         </Style>
 
+        <Style TargetType="ListBoxItem">
+            <Setter Property="Foreground" Value="{DynamicResource CorTextoPrimario}"/>
+        </Style>
+
         <Style TargetType="MenuItem">
             <Setter Property="Foreground" Value="{DynamicResource CorTextoPrimario}"/>
             <Setter Property="Background" Value="Transparent"/>
@@ -291,15 +295,39 @@
                             Style="{StaticResource BotaoJogar}"
                             Click="BtnGerenciarMods_Click"/>
 
-                    <Button x:Name="BtnJogar"
-                            Content="Aplicar e Jogar"
-                            Height="44"
-                            Background="#0078D4"
-                            Foreground="White"
-                            FontSize="14"
-                            FontWeight="Bold"
-                            Style="{StaticResource BotaoJogar}"
-                            Click="BtnJogar_Click"/>
+                    <!-- Grid combinando o botão "Aplicar e Jogar" com um botão de cancelar que
+                        só aparece ao passar o mouse durante o patch (StatusPatchContainer_MouseEnter/Leave).
+                        Portado do canal beta; o estável antes não dava jeito nenhum de cancelar
+                        um patch em andamento. -->
+                    <Grid x:Name="StatusPatchContainer"
+                          Height="44"
+                          MouseEnter="StatusPatchContainer_MouseEnter"
+                          MouseLeave="StatusPatchContainer_MouseLeave">
+                        <Button x:Name="BtnJogar"
+                                Height="44"
+                                Background="#0078D4"
+                                Foreground="White"
+                                FontSize="14"
+                                FontWeight="Bold"
+                                Style="{StaticResource BotaoJogar}"
+                                Click="BtnJogar_Click">
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                <Image Source="/Assets/menu-jogar.png" Width="18" Height="18" Margin="0,0,8,0"/>
+                                <TextBlock x:Name="TxtBotaoJogar" Text="Aplicar e Jogar" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Button>
+                        <Button x:Name="BtnCancelar"
+                                Content="Cancelar"
+                                Height="44"
+                                Visibility="Collapsed"
+                                Background="#C42B1C"
+                                Foreground="White"
+                                FontSize="13"
+                                FontWeight="SemiBold"
+                                BorderThickness="0"
+                                Style="{StaticResource BotaoJogar}"
+                                Click="BtnCancelar_Click"/>
+                    </Grid>
 
                     <Grid Margin="0,8,0,0" x:Name="ProgressoContainer" Visibility="Collapsed">
                         <Border Height="18" CornerRadius="9" Background="{DynamicResource CorFundoPrincipal}" BorderBrush="{DynamicResource CorBorda}" BorderThickness="1">

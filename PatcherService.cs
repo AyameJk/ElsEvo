@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Security.Cryptography;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -27,6 +28,8 @@ namespace ElsEvo
             IProgress<EstadoPatch>? statusProgresso = null,
             CancellationToken cancelamento = default)
         {
+            RegistroLog.Registrar("Patch iniciado", $"Arquivos: {listaPatches.Count}");
+
             void Reportar(EstadoPatch estado, int percentual)
             {
                 statusProgresso?.Report(estado);
@@ -132,6 +135,7 @@ namespace ElsEvo
                 LimparRegistroDoElsword();
 
                 Reportar(EstadoPatch.Concluido, 100);
+                RegistroLog.Registrar("Patch finalizado");
             }
         }
 
@@ -144,16 +148,19 @@ namespace ElsEvo
                     acao();
                     return;
                 }
-                catch (IOException) when (i < tentativas - 1)
+                catch (IOException ex) when (i < tentativas - 1)
                 {
+                    RegistroLog.Erro($"Falha na tentativa {i + 1}/{tentativas} do patch", ex);
                     Thread.Sleep(esperaMs);
                 }
-                catch (UnauthorizedAccessException) when (i < tentativas - 1)
+                catch (UnauthorizedAccessException ex) when (i < tentativas - 1)
                 {
+                    RegistroLog.Erro($"Falha na tentativa {i + 1}/{tentativas} do patch", ex);
                     Thread.Sleep(esperaMs);
                 }
-                catch
+                catch (Exception ex)
                 {
+                    RegistroLog.Erro($"Falha definitiva na tentativa {i + 1}/{tentativas} do patch", ex);
                     return;
                 }
             }
@@ -161,8 +168,11 @@ namespace ElsEvo
 
         private static void LimparRegistroDoElsword()
         {
-            try { LimparSubchave(@"Software\ElswordINT"); } catch { }
-            try { LimparSubchave(@"Software\Nexon\Elsword\PatcherOption"); } catch { }
+            try { LimparSubchave(@"Software\ElswordINT"); }
+            catch (Exception ex) { RegistroLog.Erro("Falha ao limpar registro ElswordINT", ex); }
+
+            try { LimparSubchave(@"Software\Nexon\Elsword\PatcherOption"); }
+            catch (Exception ex) { RegistroLog.Erro("Falha ao limpar registro PatcherOption", ex); }
         }
 
         private static void LimparSubchave(string caminhoChave)
@@ -181,12 +191,38 @@ namespace ElsEvo
                 LimparSubchave(caminhoChave + "\\" + subchave);
         }
 
+        // Antes só comparava tamanho de arquivo (FileInfo.Length), o que deixava passar
+        // dois arquivos de mesmo tamanho mas conteúdo diferente. Agora confere também o
+        // hash SHA-256 real -- portado do canal beta.
         private static bool ArquivosIguais(string caminhoA, string caminhoB)
         {
             if (!File.Exists(caminhoA) || !File.Exists(caminhoB))
                 return false;
 
-            return new FileInfo(caminhoA).Length == new FileInfo(caminhoB).Length;
+            var arquivoA = new FileInfo(caminhoA);
+            var arquivoB = new FileInfo(caminhoB);
+
+            if (arquivoA.Length != arquivoB.Length)
+                return false;
+
+            try
+            {
+                using var sha256 = SHA256.Create();
+                using var streamA = File.OpenRead(caminhoA);
+                using var streamB = File.OpenRead(caminhoB);
+
+                return CryptographicOperations.FixedTimeEquals(
+                    sha256.ComputeHash(streamA),
+                    sha256.ComputeHash(streamB));
+            }
+            catch (IOException)
+            {
+                return false;
+            }
+            catch (UnauthorizedAccessException)
+            {
+                return false;
+            }
         }
 
         private static void MoverSubstituindo(string origem, string destino)
@@ -209,7 +245,7 @@ namespace ElsEvo
             foreach (var arquivo in Directory.GetFiles(caminho))
             {
                 try { File.Delete(arquivo); }
-                catch { }
+                catch (Exception ex) { RegistroLog.Erro($"Falha ao limpar arquivo temporário {arquivo}", ex); }
             }
         }
 
@@ -220,7 +256,10 @@ namespace ElsEvo
                 if (!string.IsNullOrEmpty(caminho) && Directory.Exists(caminho))
                     Directory.Delete(caminho, recursive: true);
             }
-            catch { }
+            catch (Exception ex)
+            {
+                RegistroLog.Erro($"Falha ao excluir pasta {caminho}", ex);
+            }
         }
     }
 }

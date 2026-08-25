@@ -18,6 +18,7 @@ namespace ElsEvo
     {
         private bool _modsLigados;
         private CancellationTokenSource? _cancelamentoAtual;
+        private bool _podeCancelar;
         private GerenciadorBandeja? _bandeja;
 
         private double _larguraAntesDeMaximizar;
@@ -94,6 +95,7 @@ namespace ElsEvo
             BtnGerenciarMods.Content = Idiomas.T("BtnGerenciarMods");
             TxtModsAtivos.Text = Idiomas.T("ModsAtivos");
             TxtListaVazia.Text = Idiomas.T("ListaVazia");
+            BtnCancelar.Content = Idiomas.T("Cancelar");
             StatusBadge.Text = _modsLigados ? Idiomas.T("Ligado") : Idiomas.T("Desligado");
 
             AtualizarTextoBotaoJogar();
@@ -110,13 +112,21 @@ namespace ElsEvo
             foreach (var grupo in porPack)
             {
                 int quantidade = grupo.Count();
+                int ausentes = grupo.Count(m => !File.Exists(m.CaminhoCompleto));
+
+                string nome = quantidade == 1 ? grupo.Key : $"{grupo.Key}  ({quantidade} arquivos)";
+                if (ausentes > 0)
+                    nome += $"  -  {string.Format(Idiomas.T("ArquivosAusentes"), ausentes)}";
+
                 var item = new ListBoxItem
                 {
                     Padding = new Thickness(6),
-                    Content = quantidade == 1
-                        ? grupo.Key
-                        : $"{grupo.Key}  ({quantidade} arquivos)"
+                    Content = nome
                 };
+
+                if (ausentes > 0)
+                    item.Foreground = Brushes.Orange;
+
                 ListaModsAtivos.Items.Add(item);
             }
 
@@ -179,6 +189,7 @@ namespace ElsEvo
         private void BtnToggleLigado_Click(object sender, RoutedEventArgs e)
         {
             _modsLigados = !_modsLigados;
+            RegistroLog.Registrar("Mods alternados", _modsLigados ? "Ligados" : "Desligados");
             AtualizarVisualToggle();
 
             var cfg = Properties.Settings.Default;
@@ -231,11 +242,13 @@ namespace ElsEvo
 
         private void AtualizarTextoBotaoJogar()
         {
-            BtnJogar.Content = _modsLigados ? Idiomas.T("BtnAplicarJogar") : Idiomas.T("BtnExecutarLauncher");
+            TxtBotaoJogar.Text = _modsLigados ? Idiomas.T("BtnAplicarJogar") : Idiomas.T("BtnExecutarLauncher");
         }
 
         private void MenuReiniciar_Click(object sender, RoutedEventArgs e)
         {
+            RegistroLog.Registrar("Reinício solicitado");
+
             string caminhoExeAtual = Process.GetCurrentProcess().MainModule?.FileName
                                       ?? Environment.ProcessPath
                                       ?? string.Empty;
@@ -248,31 +261,109 @@ namespace ElsEvo
 
         private void MenuLimparCache_Click(object sender, RoutedEventArgs e)
         {
+            RegistroLog.Registrar("Limpeza de cache solicitada");
+
             try
             {
                 string pastaCache = Paths.Main.Cache;
-                foreach (var arquivo in Directory.GetFiles(pastaCache))
-                    File.Delete(arquivo);
 
-                MessageBox.Show("Cache de arquivos limpo com sucesso.", "ElsEvo",
-                    MessageBoxButton.OK, MessageBoxImage.Information);
+                bool limpezaCompleta = TentarApagarPastaInteira(pastaCache);
+
+                if (!limpezaCompleta)
+                    limpezaCompleta = ApagarConteudoTolerandoArquivosTravados(pastaCache);
+
+                Directory.CreateDirectory(pastaCache);
+
+                if (limpezaCompleta)
+                {
+                    JanelaConfirmacao.Mostrar(this,
+                        "Cache limpo",
+                        "O cache de arquivos temporários foi limpo com sucesso.",
+                        TipoMensagem.Sucesso);
+                }
+                else
+                {
+                    JanelaConfirmacao.Mostrar(this,
+                        "Cache parcialmente limpo",
+                        "A maior parte do cache foi limpa, mas alguns arquivos estavam em uso " +
+                        "por outro programa (ex.: o jogo ou uma execução em andamento) e não " +
+                        "puderam ser removidos agora. Feche esses programas e tente novamente " +
+                        "se quiser limpar tudo.",
+                        TipoMensagem.Aviso);
+                }
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Não foi possível limpar o cache:\n{ex.Message}", "ElsEvo",
-                    MessageBoxButton.OK, MessageBoxImage.Error);
+                JanelaConfirmacao.Mostrar(this,
+                    "Erro ao limpar cache",
+                    $"Não foi possível limpar o cache:\n{ex.Message}",
+                    TipoMensagem.Erro);
             }
+        }
+
+        // Apaga a pasta inteira de uma vez. Falha (retorna false) quando algum arquivo
+        // está travado por outro processo -- nesse caso o chamador cai pro método tolerante.
+        private static bool TentarApagarPastaInteira(string pasta)
+        {
+            try
+            {
+                if (Directory.Exists(pasta))
+                    Directory.Delete(pasta, recursive: true);
+                return true;
+            }
+            catch (UnauthorizedAccessException)
+            {
+                return false;
+            }
+            catch (IOException)
+            {
+                return false;
+            }
+        }
+
+        // Apaga o que consegue, arquivo por arquivo e pasta por pasta, ignorando o que
+        // estiver travado. Retorna false se algo ficou pra trás. Portado do canal beta.
+        private static bool ApagarConteudoTolerandoArquivosTravados(string pasta)
+        {
+            if (!Directory.Exists(pasta))
+                return true;
+
+            bool tudoRemovido = true;
+
+            foreach (var arquivo in Directory.GetFiles(pasta, "*", SearchOption.AllDirectories))
+            {
+                try { File.Delete(arquivo); }
+                catch { tudoRemovido = false; }
+            }
+
+            var subpastas = Directory.GetDirectories(pasta, "*", SearchOption.AllDirectories)
+                .OrderByDescending(p => p.Length);
+
+            foreach (var subpasta in subpastas)
+            {
+                try
+                {
+                    if (!Directory.EnumerateFileSystemEntries(subpasta).Any())
+                        Directory.Delete(subpasta);
+                    else
+                        tudoRemovido = false;
+                }
+                catch { tudoRemovido = false; }
+            }
+
+            return tudoRemovido;
         }
 
         private void MenuLimparConfiguracoes_Click(object sender, RoutedEventArgs e)
         {
-            var resposta = MessageBox.Show(
-                "Isso vai restaurar todas as configurações do ElsEvo para o padrão. Continuar?",
-                "Limpar configurações",
-                MessageBoxButton.YesNo,
-                MessageBoxImage.Warning);
+            RegistroLog.Registrar("Limpeza de configurações solicitada");
 
-            if (resposta != MessageBoxResult.Yes)
+            bool confirmou = JanelaConfirmacao.Confirmar(this,
+                "Limpar configurações",
+                "Isso vai restaurar todas as configurações do ElsEvo para o padrão. Continuar?",
+                TipoMensagem.Aviso);
+
+            if (!confirmou)
                 return;
 
             Properties.Settings.Default.Reset();
@@ -282,43 +373,69 @@ namespace ElsEvo
             InicializacaoComWindows.Aplicar(Properties.Settings.Default.IniciarComWindows);
             AplicarIdioma();
 
-            MessageBox.Show("Configurações restauradas para o padrão.", "ElsEvo",
-                MessageBoxButton.OK, MessageBoxImage.Information);
+            JanelaConfirmacao.Mostrar(this,
+                "Configurações restauradas",
+                "Todas as configurações do ElsEvo foram restauradas para o padrão.",
+                TipoMensagem.Sucesso);
         }
 
         private void MenuExcluirMods_Click(object sender, RoutedEventArgs e)
         {
-            var resposta = MessageBox.Show(
-                "Isso vai excluir TODOS os packs de mods importados. Essa ação não pode ser desfeita. Continuar?",
-                "Excluir todos os mods",
-                MessageBoxButton.YesNo,
-                MessageBoxImage.Warning);
+            RegistroLog.Registrar("Exclusão de todos os mods solicitada");
 
-            if (resposta != MessageBoxResult.Yes)
+            bool confirmou = JanelaConfirmacao.Confirmar(this,
+                "Excluir todos os mods",
+                "Isso vai excluir TODOS os packs de mods importados. Essa ação não pode ser desfeita. Continuar?",
+                TipoMensagem.Aviso);
+
+            if (!confirmou)
                 return;
 
             try
             {
                 string pastaPacks = Paths.Main.Packs;
-                if (Directory.Exists(pastaPacks))
-                    Directory.Delete(pastaPacks, recursive: true);
+
+                bool exclusaoCompleta = TentarApagarPastaInteira(pastaPacks);
+
+                if (!exclusaoCompleta)
+                    exclusaoCompleta = ApagarConteudoTolerandoArquivosTravados(pastaPacks);
+
                 Directory.CreateDirectory(pastaPacks);
 
                 GerenciadorDeMods.Salvar(new List<ModAtivo>());
                 AtualizarListaDeModsAtivos();
 
-                MessageBox.Show("Todos os mods foram excluídos.", "ElsEvo",
-                    MessageBoxButton.OK, MessageBoxImage.Information);
+                if (exclusaoCompleta)
+                {
+                    JanelaConfirmacao.Mostrar(this,
+                        "Mods excluídos",
+                        "Todos os mods foram excluídos.",
+                        TipoMensagem.Sucesso);
+                }
+                else
+                {
+                    JanelaConfirmacao.Mostrar(this,
+                        "Mods parcialmente excluídos",
+                        "A maior parte dos mods foi excluída, mas alguns arquivos estavam em uso " +
+                        "por outro programa (ex.: o jogo ou uma execução em andamento) e não " +
+                        "puderam ser removidos agora. Feche esses programas e tente novamente " +
+                        "se quiser excluir tudo.",
+                        TipoMensagem.Aviso);
+                }
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Não foi possível excluir os mods:\n{ex.Message}", "ElsEvo",
-                    MessageBoxButton.OK, MessageBoxImage.Error);
+                JanelaConfirmacao.Mostrar(this,
+                    "Erro ao excluir mods",
+                    $"Não foi possível excluir os mods:\n{ex.Message}",
+                    TipoMensagem.Erro);
             }
         }
 
         private void MenuConfiguracoes_Click(object sender, RoutedEventArgs e)
         {
+            RegistroLog.Registrar("Janela de configurações aberta");
+
             var janela = new PreferenciasWindow { Owner = this };
             janela.ShowDialog();
 
@@ -328,12 +445,16 @@ namespace ElsEvo
 
         private void MenuSobre_Click(object sender, RoutedEventArgs e)
         {
+            RegistroLog.Registrar("Janela Sobre aberta");
+
             var janela = new SobreWindow { Owner = this };
             janela.ShowDialog();
         }
 
         private void BtnGerenciarMods_Click(object sender, RoutedEventArgs e)
         {
+            RegistroLog.Registrar("Janela Gerenciar Mods aberta");
+
             var janela = new GerenciarModsWindow { Owner = this };
             janela.ShowDialog();
 
@@ -342,12 +463,15 @@ namespace ElsEvo
 
         private async void BtnJogar_Click(object sender, RoutedEventArgs e)
         {
+            RegistroLog.Registrar("Aplicar e Jogar solicitado", _modsLigados ? "Mods ligados" : "Mods desligados");
+
             if (!Paths.Elsword.IsValidElswordDir(Properties.Settings.Default.ElswordDirectory))
             {
-                MessageBox.Show(
+                JanelaConfirmacao.Mostrar(this,
+                    "Pasta do jogo inválida",
                     "A pasta do Elsword configurada não é válida (precisa ter \"elsword.exe\" e a pasta \"data\").\n" +
                     "Configure em Configurações → Elsword → Localização do jogo.",
-                    "ElsEvo", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    TipoMensagem.Aviso);
                 return;
             }
 
@@ -356,6 +480,23 @@ namespace ElsEvo
             if (_modsLigados)
             {
                 var ativos = GerenciadorDeMods.Carregar();
+
+                // Avisa sobre mods que sumiram (arquivo movido/apagado manualmente) antes de
+                // seguir em frente, em vez de simplesmente ignorá-los em silêncio. Portado
+                // do canal beta.
+                var modsAusentes = ativos
+                    .Where(m => !File.Exists(m.CaminhoCompleto))
+                    .ToList();
+
+                if (modsAusentes.Count > 0)
+                {
+                    string nomesAusentes = string.Join("\n", modsAusentes.Select(m => $"• {m.NomeDoPack}: {m.Arquivo}"));
+                    JanelaConfirmacao.Mostrar(this,
+                        Idiomas.T("ModsAusentesTitulo"),
+                        string.Format(Idiomas.T("ModsAusentesMensagem"), nomesAusentes),
+                        TipoMensagem.Aviso);
+                }
+
                 listaDePatches = ativos
                     .Where(m => File.Exists(m.CaminhoCompleto))
                     .Select(m => new PatchInfo(m))
@@ -363,7 +504,7 @@ namespace ElsEvo
             }
 
             BtnJogar.IsEnabled = false;
-            BtnJogar.Content = "Aguardando o launcher...";
+            TxtBotaoJogar.Text = "Aguardando o launcher...";
 
             ProgressoContainer.Visibility = Visibility.Visible;
             BarraProgresso.Value = 0;
@@ -377,7 +518,7 @@ namespace ElsEvo
 
             var statusProgresso = new Progress<EstadoPatch>(estado =>
             {
-                BtnJogar.Content = estado switch
+                TxtBotaoJogar.Text = estado switch
                 {
                     EstadoPatch.PreparandoArquivos => "Preparando arquivos...",
                     EstadoPatch.AguardandoElswordAbrir => "Aguardando o launcher fechar...",
@@ -387,9 +528,22 @@ namespace ElsEvo
                     EstadoPatch.RestaurandoBackup => "Restaurando backup...",
                     _ => "Concluído"
                 };
+
+                // Só permite cancelar nos estágios anteriores à espera do jogo abrir de
+                // verdade -- depois que o backup foi trocado e o jogo já está de pé, cancelar
+                // no meio do caminho deixaria arquivos trocados sem o jogo aberto pra fechar
+                // e disparar a restauração no finally.
+                _podeCancelar = estado is EstadoPatch.PreparandoArquivos
+                    or EstadoPatch.AguardandoElswordAbrir
+                    or EstadoPatch.FazendoBackup
+                    or EstadoPatch.Aplicando;
+
+                if (!_podeCancelar)
+                    BtnCancelar.Visibility = Visibility.Collapsed;
             });
 
             _cancelamentoAtual = new CancellationTokenSource();
+            _podeCancelar = true;
 
             try
             {
@@ -398,20 +552,52 @@ namespace ElsEvo
             }
             catch (OperationCanceledException)
             {
-
+                RegistroLog.Registrar("Patch cancelado");
+                JanelaConfirmacao.Mostrar(this,
+                    Idiomas.T("Cancelar"),
+                    Idiomas.T("OperacaoCancelada"),
+                    TipoMensagem.Informacao);
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Ocorreu um erro durante o patch:\n{ex.Message}",
-                    "ElsEvo", MessageBoxButton.OK, MessageBoxImage.Error);
+                JanelaConfirmacao.Mostrar(this,
+                    "Erro durante o patch",
+                    $"Ocorreu um erro durante o patch:\n{ex.Message}",
+                    TipoMensagem.Erro);
             }
             finally
             {
                 BtnJogar.IsEnabled = true;
                 AtualizarTextoBotaoJogar();
                 ProgressoContainer.Visibility = Visibility.Collapsed;
+                BtnCancelar.IsEnabled = true;
+                BtnCancelar.Visibility = Visibility.Collapsed;
+                _podeCancelar = false;
                 _cancelamentoAtual = null;
             }
+        }
+
+        private void BtnCancelar_Click(object sender, RoutedEventArgs e)
+        {
+            if (_cancelamentoAtual == null)
+                return;
+
+            BtnCancelar.IsEnabled = false;
+            RegistroLog.Registrar("Cancelamento do patch solicitado");
+            TxtBotaoJogar.Text = "Cancelando...";
+            _cancelamentoAtual.Cancel();
+        }
+
+        private void StatusPatchContainer_MouseEnter(object sender, MouseEventArgs e)
+        {
+            if (_cancelamentoAtual != null && _podeCancelar)
+                BtnCancelar.Visibility = Visibility.Visible;
+        }
+
+        private void StatusPatchContainer_MouseLeave(object sender, MouseEventArgs e)
+        {
+            if (_cancelamentoAtual == null || !_podeCancelar)
+                BtnCancelar.Visibility = Visibility.Collapsed;
         }
 
         private async Task VerificarAtualizacaoAsync()
@@ -480,11 +666,12 @@ namespace ElsEvo
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show(
+                    JanelaConfirmacao.Mostrar(this,
+                        "Falha ao atualizar",
                         $"Não foi possível baixar a atualização automaticamente:\n{ex.Message}\n\n" +
                         "O ElsEvo vai continuar funcionando normalmente na versão atual. Você pode " +
                         "tentar de novo mais tarde, ou baixar manualmente pela página de Releases no GitHub.",
-                        "Falha ao atualizar", MessageBoxButton.OK, MessageBoxImage.Warning);
+                        TipoMensagem.Aviso);
                 }
 
                 if (!baixouComSucesso)
@@ -524,10 +711,11 @@ namespace ElsEvo
                 catch (Exception ex)
                 {
                     timerPontinhos.Stop();
-                    MessageBox.Show(
+                    JanelaConfirmacao.Mostrar(this,
+                        "Falha ao iniciar instalador",
                         $"O instalador foi baixado, mas não foi possível executá-lo automaticamente:\n{ex.Message}\n\n" +
                         $"Você pode rodar ele manualmente em:\n{caminhoInstalador}",
-                        "Falha ao iniciar instalador", MessageBoxButton.OK, MessageBoxImage.Warning);
+                        TipoMensagem.Aviso);
                     return;
                 }
 
@@ -535,12 +723,13 @@ namespace ElsEvo
 
                 if (codigoSaida != 0)
                 {
-                    MessageBox.Show(
+                    JanelaConfirmacao.Mostrar(this,
+                        "Atenção — instalação da atualização",
                         $"O instalador terminou com um erro (código {codigoSaida}) e a atualização pode não " +
                         "ter sido concluída corretamente.\n\n" +
                         "O ElsEvo vai continuar/reabrir normalmente. Se algo parecer errado, tente " +
                         "baixar e instalar manualmente pela página de Releases no GitHub.",
-                        "Atenção — instalação da atualização", MessageBoxButton.OK, MessageBoxImage.Warning);
+                        TipoMensagem.Aviso);
                 }
 
                 appVaiFecharComSucesso = true;
