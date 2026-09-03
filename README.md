@@ -1,6 +1,6 @@
 # ✦ ElsEvo
 
-**Patcher de mods para Elsword, feito do zero em C# / WPF (.NET 8).**
+**Patcher de mods para Elsword, feito do zero em C# / WPF (.NET 10).**
 
 ElsEvo automatiza o processo de aplicar mods no Elsword: seleciona os packs, faz backup dos arquivos originais, aplica os mods, abre o jogo e restaura tudo sozinho quando você fecha. Compatível com mods criados pelos próprios jogadores — vozes, texturas, BGM, vídeos e mais.
 
@@ -14,7 +14,7 @@ ElsEvo automatiza o processo de aplicar mods no Elsword: seleciona os packs, faz
   <img src="https://skillicons.dev/icons?i=cs,dotnet,git,github,vscode,windows" />
 </p>
 
-- **C# / WPF** — .NET 8
+- **C# / WPF** — .NET 10
 - **Inno Setup** — instalador Windows
 - **GitHub Actions** — build e release automatizados
 
@@ -66,14 +66,14 @@ Você pode alternar entre os canais em **Configurações → Beta apenas** — o
 
 ## 🛠️ Compilando localmente
 
-Requisitos: [.NET 8 SDK](https://dotnet.microsoft.com/download) e [Inno Setup 6](https://jrsoftware.org/isinfo.php).
+Requisitos: [.NET 10 SDK](https://dotnet.microsoft.com/download) e [Inno Setup 7](https://jrsoftware.org/isinfo.php).
 
 ```bash
 # Publicar o executável (self-contained, single-file)
 dotnet publish ElsEVO.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true
 
 # Compilar o instalador
-"C:\Program Files (x86)\Inno Setup 6\ISCC.exe" ElsEVO.iss
+"D:\Inno Setup 7\ISCC.exe" ElsEVO.iss
 ```
 
 O instalador final fica em `Output\ElsEvo-Setup.exe`.
