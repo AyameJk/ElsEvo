@@ -25,7 +25,9 @@ ElsEvo automatiza o processo de aplicar mods no Elsword: seleciona os packs, faz
 - 🎨 **Tema Claro/Escuro**, aplicado em tempo real
 - 🌐 **Multilíngue** — Português, Inglês e Chinês
 - 📦 **Gerenciador de Mods** — importe pastas ou `.zip`, organize por categoria (Geral / BGM / Vídeo)
+- 🎙️ **Download de dublagens** — baixe e instale packs oficiais diretamente pelo aplicativo
 - 🔄 **Atualização automática** — verifica, baixa e instala novas versões sozinho, sem precisar abrir o navegador
+- 🌐 **Configurações de rede** — proxy, limite de velocidade, tentativas automáticas e downloads retomáveis
 - 🛡️ **Backup e restauração seguros** — arquivos originais nunca são perdidos, mesmo se algo falhar no meio do processo
 - 🔔 **Ícone na bandeja**, inicialização com o Windows, minimizar automático
 - 🖼️ Interface 100% customizada, sem depender do chrome nativo do Windows

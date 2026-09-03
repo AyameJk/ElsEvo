@@ -42,7 +42,7 @@ namespace ElsEvo
                 AtualizarVisualToggle();
                 AplicarIdioma();
                 ConfigurarBandeja();
-                BadgeBeta.Visibility = Visibility.Collapsed;
+                BadgeBeta.Visibility = Properties.Settings.Default.IsBetaRelease ? Visibility.Visible : Visibility.Collapsed;
 
                 bool acabouDeAtualizar = Environment.GetCommandLineArgs()
                     .Any(arg => arg.Equals("--atualizado", StringComparison.OrdinalIgnoreCase));
@@ -54,7 +54,6 @@ namespace ElsEvo
                 }
                 else
                 {
-
                     _ = VerificarAtualizacaoAsync();
                 }
             };
@@ -97,23 +96,19 @@ namespace ElsEvo
             TxtListaVazia.Text = Idiomas.T("ListaVazia");
             BtnCancelar.Content = Idiomas.T("Cancelar");
             StatusBadge.Text = _modsLigados ? Idiomas.T("Ligado") : Idiomas.T("Desligado");
-
             AtualizarTextoBotaoJogar();
         }
 
         private void AtualizarListaDeModsAtivos()
         {
             var ativos = GerenciadorDeMods.Carregar();
-
             ListaModsAtivos.Items.Clear();
 
             var porPack = ativos.GroupBy(m => m.NomeDoPack);
-
             foreach (var grupo in porPack)
             {
                 int quantidade = grupo.Count();
                 int ausentes = grupo.Count(m => !File.Exists(m.CaminhoCompleto));
-
                 string nome = quantidade == 1 ? grupo.Key : $"{grupo.Key}  ({quantidade} arquivos)";
                 if (ausentes > 0)
                     nome += $"  -  {string.Format(Idiomas.T("ArquivosAusentes"), ausentes)}";
@@ -121,12 +116,10 @@ namespace ElsEvo
                 var item = new ListBoxItem
                 {
                     Padding = new Thickness(6),
-                    Content = nome
+                    Content = nome,
                 };
-
                 if (ausentes > 0)
                     item.Foreground = Brushes.Orange;
-
                 ListaModsAtivos.Items.Add(item);
             }
 
@@ -179,7 +172,6 @@ namespace ElsEvo
 
         private void Window_StateChanged(object? sender, EventArgs e)
         {
-
             if (WindowState == WindowState.Maximized)
                 WindowState = WindowState.Normal;
         }
@@ -237,18 +229,38 @@ namespace ElsEvo
                 }
             }
 
+            AtualizarCorBadgeBeta();
             AtualizarTextoBotaoJogar();
+        }
+
+        private void AtualizarCorBadgeBeta()
+        {
+            var bc = new BrushConverter();
+            bool temaClaro = Properties.Settings.Default.TemaClaro;
+
+            if (temaClaro)
+            {
+                BadgeBeta.Background = (Brush)bc.ConvertFrom("#D32F2F")!;
+                BadgeBeta.BorderThickness = new Thickness(0);
+                ((TextBlock)BadgeBeta.Child).Foreground = Brushes.White;
+            }
+            else
+            {
+                BadgeBeta.Background = (Brush)bc.ConvertFrom("#3D2F1E")!;
+                BadgeBeta.BorderBrush = (Brush)bc.ConvertFrom("#B8860B")!;
+                BadgeBeta.BorderThickness = new Thickness(1);
+                ((TextBlock)BadgeBeta.Child).Foreground = (Brush)bc.ConvertFrom("#E0B060")!;
+            }
         }
 
         private void AtualizarTextoBotaoJogar()
         {
-            TxtBotaoJogar.Text = _modsLigados ? Idiomas.T("BtnAplicarJogar") : Idiomas.T("BtnExecutarLauncher");
+            TxtStatusJogar.Text = _modsLigados ? Idiomas.T("BtnAplicarJogar") : Idiomas.T("BtnExecutarLauncher");
         }
 
         private void MenuReiniciar_Click(object sender, RoutedEventArgs e)
         {
             RegistroLog.Registrar("Reinício solicitado");
-
             string caminhoExeAtual = Process.GetCurrentProcess().MainModule?.FileName
                                       ?? Environment.ProcessPath
                                       ?? string.Empty;
@@ -262,7 +274,6 @@ namespace ElsEvo
         private void MenuLimparCache_Click(object sender, RoutedEventArgs e)
         {
             RegistroLog.Registrar("Limpeza de cache solicitada");
-
             try
             {
                 string pastaCache = Paths.Main.Cache;
@@ -301,14 +312,12 @@ namespace ElsEvo
             }
         }
 
-        // Apaga a pasta inteira de uma vez. Falha (retorna false) quando algum arquivo
-        // está travado por outro processo -- nesse caso o chamador cai pro método tolerante.
-        private static bool TentarApagarPastaInteira(string pasta)
+        private static bool TentarApagarPastaInteira(string pastaCache)
         {
             try
             {
-                if (Directory.Exists(pasta))
-                    Directory.Delete(pasta, recursive: true);
+                if (Directory.Exists(pastaCache))
+                    Directory.Delete(pastaCache, recursive: true);
                 return true;
             }
             catch (UnauthorizedAccessException)
@@ -321,22 +330,20 @@ namespace ElsEvo
             }
         }
 
-        // Apaga o que consegue, arquivo por arquivo e pasta por pasta, ignorando o que
-        // estiver travado. Retorna false se algo ficou pra trás. Portado do canal beta.
-        private static bool ApagarConteudoTolerandoArquivosTravados(string pasta)
+        private static bool ApagarConteudoTolerandoArquivosTravados(string pastaCache)
         {
-            if (!Directory.Exists(pasta))
+            if (!Directory.Exists(pastaCache))
                 return true;
 
             bool tudoRemovido = true;
 
-            foreach (var arquivo in Directory.GetFiles(pasta, "*", SearchOption.AllDirectories))
+            foreach (var arquivo in Directory.GetFiles(pastaCache, "*", SearchOption.AllDirectories))
             {
                 try { File.Delete(arquivo); }
                 catch { tudoRemovido = false; }
             }
 
-            var subpastas = Directory.GetDirectories(pasta, "*", SearchOption.AllDirectories)
+            var subpastas = Directory.GetDirectories(pastaCache, "*", SearchOption.AllDirectories)
                 .OrderByDescending(p => p.Length);
 
             foreach (var subpasta in subpastas)
@@ -357,7 +364,6 @@ namespace ElsEvo
         private void MenuLimparConfiguracoes_Click(object sender, RoutedEventArgs e)
         {
             RegistroLog.Registrar("Limpeza de configurações solicitada");
-
             bool confirmou = JanelaConfirmacao.Confirmar(this,
                 "Limpar configurações",
                 "Isso vai restaurar todas as configurações do ElsEvo para o padrão. Continuar?",
@@ -368,6 +374,7 @@ namespace ElsEvo
 
             Properties.Settings.Default.Reset();
             Properties.Settings.Default.Save();
+            Paths.InvalidarCache();
 
             ThemeManager.AplicarTemaSalvo();
             InicializacaoComWindows.Aplicar(Properties.Settings.Default.IniciarComWindows);
@@ -382,7 +389,6 @@ namespace ElsEvo
         private void MenuExcluirMods_Click(object sender, RoutedEventArgs e)
         {
             RegistroLog.Registrar("Exclusão de todos os mods solicitada");
-
             bool confirmou = JanelaConfirmacao.Confirmar(this,
                 "Excluir todos os mods",
                 "Isso vai excluir TODOS os packs de mods importados. Essa ação não pode ser desfeita. Continuar?",
@@ -435,10 +441,10 @@ namespace ElsEvo
         private void MenuConfiguracoes_Click(object sender, RoutedEventArgs e)
         {
             RegistroLog.Registrar("Janela de configurações aberta");
-
             var janela = new PreferenciasWindow { Owner = this };
             janela.ShowDialog();
 
+            BadgeBeta.Visibility = Properties.Settings.Default.IsBetaRelease ? Visibility.Visible : Visibility.Collapsed;
             AtualizarVisualToggle();
             AplicarIdioma();
         }
@@ -446,7 +452,6 @@ namespace ElsEvo
         private void MenuSobre_Click(object sender, RoutedEventArgs e)
         {
             RegistroLog.Registrar("Janela Sobre aberta");
-
             var janela = new SobreWindow { Owner = this };
             janela.ShowDialog();
         }
@@ -454,17 +459,23 @@ namespace ElsEvo
         private void BtnGerenciarMods_Click(object sender, RoutedEventArgs e)
         {
             RegistroLog.Registrar("Janela Gerenciar Mods aberta");
-
             var janela = new GerenciarModsWindow { Owner = this };
             janela.ShowDialog();
 
             AtualizarListaDeModsAtivos();
         }
 
+        private void BtnBaixarDublagens_Click(object sender, RoutedEventArgs e)
+        {
+            RegistroLog.Registrar("Janela de download de dublagens aberta");
+            var janela = new DublagensWindow { Owner = this };
+            janela.ShowDialog();
+            AtualizarListaDeModsAtivos();
+        }
+
         private async void BtnJogar_Click(object sender, RoutedEventArgs e)
         {
             RegistroLog.Registrar("Aplicar e Jogar solicitado", _modsLigados ? "Mods ligados" : "Mods desligados");
-
             if (!Paths.Elsword.IsValidElswordDir(Properties.Settings.Default.ElswordDirectory))
             {
                 JanelaConfirmacao.Mostrar(this,
@@ -480,10 +491,6 @@ namespace ElsEvo
             if (_modsLigados)
             {
                 var ativos = GerenciadorDeMods.Carregar();
-
-                // Avisa sobre mods que sumiram (arquivo movido/apagado manualmente) antes de
-                // seguir em frente, em vez de simplesmente ignorá-los em silêncio. Portado
-                // do canal beta.
                 var modsAusentes = ativos
                     .Where(m => !File.Exists(m.CaminhoCompleto))
                     .ToList();
@@ -504,7 +511,7 @@ namespace ElsEvo
             }
 
             BtnJogar.IsEnabled = false;
-            TxtBotaoJogar.Text = "Aguardando o launcher...";
+            TxtStatusJogar.Text = "Aguardando o launcher...";
 
             ProgressoContainer.Visibility = Visibility.Visible;
             BarraProgresso.Value = 0;
@@ -518,26 +525,18 @@ namespace ElsEvo
 
             var statusProgresso = new Progress<EstadoPatch>(estado =>
             {
-                TxtBotaoJogar.Text = estado switch
+                TxtStatusJogar.Text = estado switch
                 {
                     EstadoPatch.PreparandoArquivos => "Preparando arquivos...",
                     EstadoPatch.AguardandoElswordAbrir => "Aguardando o launcher fechar...",
                     EstadoPatch.FazendoBackup => "Fazendo backup...",
                     EstadoPatch.Aplicando => "Aplicando mods...",
-                    EstadoPatch.AguardandoElswordFechar => "Mods ativos — divirta-se! 🎮",
+                    EstadoPatch.AguardandoElswordFechar => "Mods ativos — divirta-se!",
                     EstadoPatch.RestaurandoBackup => "Restaurando backup...",
                     _ => "Concluído"
                 };
-
-                // Só permite cancelar nos estágios anteriores à espera do jogo abrir de
-                // verdade -- depois que o backup foi trocado e o jogo já está de pé, cancelar
-                // no meio do caminho deixaria arquivos trocados sem o jogo aberto pra fechar
-                // e disparar a restauração no finally.
                 _podeCancelar = estado is EstadoPatch.PreparandoArquivos
-                    or EstadoPatch.AguardandoElswordAbrir
-                    or EstadoPatch.FazendoBackup
-                    or EstadoPatch.Aplicando;
-
+                    or EstadoPatch.AguardandoElswordAbrir;
                 if (!_podeCancelar)
                     BtnCancelar.Visibility = Visibility.Collapsed;
             });
@@ -584,7 +583,7 @@ namespace ElsEvo
 
             BtnCancelar.IsEnabled = false;
             RegistroLog.Registrar("Cancelamento do patch solicitado");
-            TxtBotaoJogar.Text = "Cancelando...";
+            TxtStatusJogar.Text = "Cancelando...";
             _cancelamentoAtual.Cancel();
         }
 
@@ -624,6 +623,7 @@ namespace ElsEvo
 
             BtnJogar.IsEnabled = false;
             BtnGerenciarMods.IsEnabled = false;
+            BtnBaixarDublagens.IsEnabled = false;
             bool appVaiFecharComSucesso = false;
 
             try
@@ -693,16 +693,15 @@ namespace ElsEvo
 
                 try
                 {
-                    Process.Start(new ProcessStartInfo
+                    var processoInstalador = Process.Start(new ProcessStartInfo
                     {
                         FileName = caminhoInstalador,
-                        Arguments = "/VERYSILENT /SUPPRESSMSGBOXES /NORESTART /SP-",
+                        Arguments = "/VERYSILENT /SUPPRESSMSGBOXES /RESTARTAPPLICATIONS /SP-",
                         UseShellExecute = true
                     });
 
-                    timerPontinhos.Stop();
-                    appVaiFecharComSucesso = true;
-                    Application.Current.Shutdown();
+                    if (processoInstalador == null)
+                        throw new InvalidOperationException("Não foi possível iniciar o processo do instalador.");
                 }
                 catch (Exception ex)
                 {
@@ -714,6 +713,11 @@ namespace ElsEvo
                         TipoMensagem.Aviso);
                     return;
                 }
+
+                timerPontinhos.Stop();
+
+                appVaiFecharComSucesso = true;
+                Application.Current.Shutdown();
             }
             finally
             {
@@ -722,6 +726,7 @@ namespace ElsEvo
                     ProgressoContainer.Visibility = Visibility.Collapsed;
                     BtnJogar.IsEnabled = true;
                     BtnGerenciarMods.IsEnabled = true;
+                    BtnBaixarDublagens.IsEnabled = true;
                 }
             }
         }
@@ -743,7 +748,7 @@ namespace ElsEvo
                 catch { }
             }
 
-            Log("===== Iniciando ReabrirAppAtualizadoEFechar =====");
+            Log("===== Iniciando ReabrirAppAtualizadoEFechar (canal BETA) =====");
             Log($"Caminho via registro: {caminhoRegistro ?? "(não encontrado)"}");
             Log($"Caminho do processo atual: {caminhoProcessoAtual ?? "(nulo)"}");
             Log($"Caminho escolhido: {caminhoExeNovo ?? "(nenhum)"}");
@@ -815,7 +820,6 @@ namespace ElsEvo
                     }
                     catch
                     {
-
                     }
                 }
             }

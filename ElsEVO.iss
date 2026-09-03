@@ -10,7 +10,7 @@
 #define MyAppAssocKey StringChange(MyAppAssocName, " ", "") + MyAppAssocExt
 #define DoubleAmp(Value) StringChange(Value, "&", "&&")
 #define EscapeConstArgument(Value) StringChange(StringChange(StringChange(Value, "%", "%25"), ",", "%2c"), "}", "%7d")
-#define PublishDir "bin\Release\net10.0-windows\win-x64"
+#define PublishDir "bin\Release\net10.0-windows10.0.19041.0\win-x64"
 
 [Setup]
 AppId={{8910440C-BF7A-494D-B5AD-7F0A4DA85D60}

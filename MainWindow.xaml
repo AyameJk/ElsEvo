@@ -17,7 +17,7 @@
             <Setter Property="Width" Value="32"/>
             <Setter Property="Height" Value="28"/>
             <Setter Property="Background" Value="Transparent"/>
-            <Setter Property="Foreground" Value="#CCCCCC"/>
+            <Setter Property="Foreground" Value="{DynamicResource CorTextoBarraTitulo}"/>
             <Setter Property="BorderThickness" Value="0"/>
             <Setter Property="Cursor" Value="Hand"/>
             <Setter Property="FontFamily" Value="Segoe MDL2 Assets"/>
@@ -30,12 +30,35 @@
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="border" Property="Background" Value="#3A3A3D"/>
+                                <Setter TargetName="border" Property="Background" Value="{DynamicResource CorBotaoJanelaHover}"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
+        </Style>
+
+        <Style x:Key="BotaoFechar" TargetType="Button" BasedOn="{StaticResource BotaoJanela}">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="border" Background="{TemplateBinding Background}" CornerRadius="6">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="{DynamicResource CorBotaoFecharHover}"/>
+                                <Setter Property="Foreground" Value="White"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="{DynamicResource CorBotaoFecharHover}"/>
+                </Trigger>
+            </Style.Triggers>
         </Style>
 
         <Style x:Key="BotaoJogar" TargetType="Button">
@@ -50,14 +73,40 @@
                             <Trigger Property="IsMouseOver" Value="True">
                                 <Setter TargetName="border" Property="Background" Value="#1387E8"/>
                             </Trigger>
-                            <Trigger Property="IsEnabled" Value="False">
-                                <Setter TargetName="border" Property="Background" Value="#3A3A3D"/>
-                                <Setter Property="Foreground" Value="#9A9A9A"/>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsEnabled" Value="False">
+                    <Setter Property="Opacity" Value="0.45"/>
+                    <Setter Property="Cursor" Value="Arrow"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="BotaoCancelar" TargetType="Button">
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="border" Background="{TemplateBinding Background}" CornerRadius="8">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="#A92318"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsEnabled" Value="False">
+                    <Setter Property="Opacity" Value="0.45"/>
+                    <Setter Property="Cursor" Value="Arrow"/>
+                </Trigger>
+            </Style.Triggers>
         </Style>
 
         <Style x:Key="BotaoToggle" TargetType="Button">
@@ -85,7 +134,6 @@
                 <Setter.Value>
                     <ControlTemplate TargetType="MenuItem">
                         <Grid>
-
                             <Border x:Name="fundoTopo"
                                     Background="{TemplateBinding Background}"
                                     CornerRadius="4"
@@ -179,7 +227,7 @@
                 <StackPanel Grid.Column="1" Orientation="Horizontal" Margin="0,4,4,0">
                     <Button Style="{StaticResource BotaoJanela}" Click="BtnMinimizar_Click" ToolTip="Minimizar" Content="&#xE921;"/>
                     <Button x:Name="BtnMaximizar" Style="{StaticResource BotaoJanela}" Click="BtnMaximizar_Click" ToolTip="Maximizar" Content="&#xE922;"/>
-                    <Button Style="{StaticResource BotaoJanela}" Click="BtnFechar_Click" ToolTip="Fechar" Content="&#xE8BB;"/>
+                    <Button Style="{StaticResource BotaoFechar}" Click="BtnFechar_Click" ToolTip="Fechar" Content="&#xE8BB;"/>
                 </StackPanel>
 
             </Grid>
@@ -285,20 +333,34 @@
 
                 <StackPanel Grid.Row="3">
 
-                    <Button x:Name="BtnGerenciarMods"
-                            Content="Gerenciar Mods"
-                            Height="36"
-                            Margin="0,0,0,10"
-                            Background="{DynamicResource CorBotaoFlat}"
-                            Foreground="{DynamicResource CorTextoPrimario}"
-                            FontWeight="SemiBold"
-                            Style="{StaticResource BotaoJogar}"
-                            Click="BtnGerenciarMods_Click"/>
+                    <Grid Margin="0,0,0,10">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <Button x:Name="BtnGerenciarMods"
+                                Content="Gerenciar Mods"
+                                Height="36"
+                                Background="{DynamicResource CorBotaoFlat}"
+                                Foreground="{DynamicResource CorTextoPrimario}"
+                                FontWeight="SemiBold"
+                                Style="{StaticResource BotaoJogar}"
+                                Click="BtnGerenciarMods_Click"/>
+                        <Button x:Name="BtnBaixarDublagens"
+                                Grid.Column="1"
+                                Width="42"
+                                Height="36"
+                                Margin="8,0,0,0"
+                                Padding="0"
+                                Background="{DynamicResource CorBotaoFlat}"
+                                Foreground="{DynamicResource CorTextoPrimario}"
+                                Style="{StaticResource BotaoJogar}"
+                                ToolTip="Baixar dublagens"
+                                Click="BtnBaixarDublagens_Click">
+                            <Image Source="Assets/menu-download.png" Width="16" Height="16" Stretch="Uniform"/>
+                        </Button>
+                    </Grid>
 
-                    <!-- Grid combinando o botão "Aplicar e Jogar" com um botão de cancelar que
-                        só aparece ao passar o mouse durante o patch (StatusPatchContainer_MouseEnter/Leave).
-                        Portado do canal beta; o estável antes não dava jeito nenhum de cancelar
-                        um patch em andamento. -->
                     <Grid x:Name="StatusPatchContainer"
                           Height="44"
                           MouseEnter="StatusPatchContainer_MouseEnter"
@@ -312,8 +374,13 @@
                                 Style="{StaticResource BotaoJogar}"
                                 Click="BtnJogar_Click">
                             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                                <Image Source="/Assets/menu-jogar.png" Width="18" Height="18" Margin="0,0,8,0"/>
-                                <TextBlock x:Name="TxtBotaoJogar" Text="Aplicar e Jogar" VerticalAlignment="Center"/>
+                                <TextBlock x:Name="TxtStatusJogar" VerticalAlignment="Center"/>
+                                    <Image Source="Assets/menu-jogar.png"
+                                        Width="22"
+                                        Height="22"
+                                        Stretch="Uniform"
+                                        Margin="7,0,0,0"
+                                        VerticalAlignment="Center"/>
                             </StackPanel>
                         </Button>
                         <Button x:Name="BtnCancelar"
@@ -325,11 +392,11 @@
                                 FontSize="13"
                                 FontWeight="SemiBold"
                                 BorderThickness="0"
-                                Style="{StaticResource BotaoJogar}"
+                            Style="{StaticResource BotaoCancelar}"
                                 Click="BtnCancelar_Click"/>
                     </Grid>
 
-                    <Grid Margin="0,8,0,0" x:Name="ProgressoContainer" Visibility="Collapsed">
+                    <StackPanel Margin="0,8,0,0" x:Name="ProgressoContainer" Visibility="Collapsed">
                         <Border Height="18" CornerRadius="9" Background="{DynamicResource CorFundoPrincipal}" BorderBrush="{DynamicResource CorBorda}" BorderThickness="1">
                             <Grid>
                                 <ProgressBar x:Name="BarraProgresso" Minimum="0" Maximum="100" Value="0" Height="16" Margin="1">
@@ -348,10 +415,15 @@
                                     </ProgressBar.Template>
                                 </ProgressBar>
                                 <TextBlock x:Name="TxtProgresso" Text="0%" Foreground="White" FontSize="10" FontWeight="Bold"
-                                           HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                           HorizontalAlignment="Center" VerticalAlignment="Center">
+
+                                    <TextBlock.Effect>
+                                        <DropShadowEffect Color="Black" BlurRadius="4" ShadowDepth="0" Opacity="0.85"/>
+                                    </TextBlock.Effect>
+                                </TextBlock>
                             </Grid>
                         </Border>
-                    </Grid>
+                    </StackPanel>
 
                 </StackPanel>
 

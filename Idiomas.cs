@@ -3,7 +3,6 @@ using System.Collections.Generic;
 
 namespace ElsEvo
 {
-
     public static class Idiomas
     {
         public static event Action? IdiomaMudou;
@@ -34,6 +33,7 @@ namespace ElsEvo
                 ["TituloConfiguracoes"] = "Configurações",
                 ["AbaElsword"] = "Elsword",
                 ["AbaInicializador"] = "Inicializador",
+                ["AbaRede"] = "Rede",
                 ["BotaoOk"] = "OK",
                 ["BotaoCancelar"] = "Cancelar",
                 ["BotaoAplicar"] = "Aplicar",
@@ -76,7 +76,7 @@ namespace ElsEvo
                 ["IdiomaPortugues"] = "Português",
                 ["IdiomaIngles"] = "Inglês",
                 ["IdiomaChines"] = "Chinês",
-                ["SobreVersaoEstavel"] = "Versão estável: {0}"
+                ["SobreVersaoBeta"] = "Versão Beta: {0}"
             },
             ["en"] = new()
             {
@@ -102,6 +102,7 @@ namespace ElsEvo
                 ["TituloConfiguracoes"] = "Settings",
                 ["AbaElsword"] = "Elsword",
                 ["AbaInicializador"] = "Launcher",
+                ["AbaRede"] = "Network",
                 ["BotaoOk"] = "OK",
                 ["BotaoCancelar"] = "Cancel",
                 ["BotaoAplicar"] = "Apply",
@@ -144,7 +145,7 @@ namespace ElsEvo
                 ["IdiomaPortugues"] = "Portuguese",
                 ["IdiomaIngles"] = "English",
                 ["IdiomaChines"] = "Chinese",
-                ["SobreVersaoEstavel"] = "Stable version: {0}"
+                ["SobreVersaoBeta"] = "Beta version: {0}"
             },
             ["zh"] = new()
             {
@@ -170,6 +171,7 @@ namespace ElsEvo
                 ["TituloConfiguracoes"] = "设置",
                 ["AbaElsword"] = "Elsword",
                 ["AbaInicializador"] = "启动器",
+                ["AbaRede"] = "网络",
                 ["BotaoOk"] = "确定",
                 ["BotaoCancelar"] = "取消",
                 ["BotaoAplicar"] = "应用",
@@ -212,7 +214,7 @@ namespace ElsEvo
                 ["IdiomaPortugues"] = "葡萄牙语",
                 ["IdiomaIngles"] = "英语",
                 ["IdiomaChines"] = "中文",
-                ["SobreVersaoEstavel"] = "稳定版本: {0}"
+                ["SobreVersaoBeta"] = "测试版版本: {0}"
             }
         };
 

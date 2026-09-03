@@ -2,7 +2,8 @@
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net10.0-windows</TargetFramework>
+    <TargetFramework>net10.0-windows10.0.19041.0</TargetFramework>
+    <TargetPlatformVersion>10.0.19041.0</TargetPlatformVersion>
     <Nullable>enable</Nullable>
     <UseWPF>true</UseWPF>
     <UseWindowsForms>true</UseWindowsForms>
@@ -20,10 +21,16 @@
          embutidas no assembly e são referenciadas no XAML como caminho relativo simples
          (Image Source="Assets/nome.png"), sem pack://, sem busca por nome. -->
     <Resource Include="Assets\*.png" />
+    <Resource Include="Assets\*.gif" />
 
     <!-- O banco de descrições (JSON) continua como arquivo solto, copiado pra saída,
          porque BancoDeArquivos.cs lê ele direto do disco com File.ReadAllText. -->
     <None Include="Assets\*.json" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="SharpCompress" Version="0.50.4" />
+    <PackageReference Include="WpfAnimatedGif" Version="2.0.2" />
   </ItemGroup>
 
 </Project>

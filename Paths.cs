@@ -8,6 +8,10 @@ namespace ElsEvo
 
     public static class Paths
     {
+        public static void InvalidarCache()
+        {
+        }
+
         public static class Elsword
         {
             public static string Root => Properties.Settings.Default.ElswordDirectory;
