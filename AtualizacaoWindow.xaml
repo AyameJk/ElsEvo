@@ -149,19 +149,25 @@
                 Padding="10"
                 Margin="0,0,0,10"
                 Visibility="Collapsed">
-            <StackPanel Orientation="Horizontal">
-                <TextBlock Text="&#xE7BA;"
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="0"
+                           Text="&#xE7BA;"
                            FontFamily="Segoe MDL2 Assets"
                            FontSize="14"
                            Foreground="#F5C542"
                            VerticalAlignment="Top"
                            Margin="0,1,8,0"/>
-                <TextBlock x:Name="TxtAvisoBeta"
+                <TextBlock Grid.Column="1"
+                           x:Name="TxtAvisoBeta"
                            Text="Essa é uma versão BETA (canal de testes) — pode ter bugs que a versão estável não tem. Ela será instalada por cima da sua instalação atual."
                            Foreground="#E3D2A8"
                            FontSize="11"
                            TextWrapping="Wrap"/>
-            </StackPanel>
+            </Grid>
         </Border>
 
         <TextBlock Grid.Row="3"

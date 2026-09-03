@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.Net;
 using System.Net.Http;
@@ -6,6 +7,8 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Documents;
+using System.Windows.Navigation;
 using System.Windows.Media.Imaging;
 
 namespace ElsEvo
@@ -15,15 +18,20 @@ namespace ElsEvo
     {
 
         private static readonly Regex RegexElementoEspecial = new(
-            @"<img[^>]*\ssrc=[""'](?<urlImagem>[^""']+)[""'][^>]*/?>" +
-            @"|<blockquote[^>]*>(?<citacaoHtml>.*?)</blockquote>" +
+            @"<img\b[^>]*\bsrc\s*=\s*(?:[""'](?<urlImagem>[^""']+)[""']|(?<urlImagem>[^\s>]+))[^>]*/?>" +
+            @"|<blockquote[^>]*>(?<citacaoHtml>[\s\S]*?)</blockquote>" +
             @"|^[ \t]*>[ \t]*(?<citacao>.+)$" +
-            @"|<h[1-6][^>]*>(?<tituloHtml>.*?)</h[1-6]>" +
+            @"|^[ \t]*[-*+][ \t]+(?<itemLista>.+)$" +
+            @"|<h[1-6][^>]*>(?<tituloHtml>[\s\S]*?)</h[1-6]>" +
             @"|^[ \t]*#{1,6}[ \t]+(?<tituloMd>.+)$",
-            RegexOptions.IgnoreCase | RegexOptions.Multiline | RegexOptions.Singleline);
+            RegexOptions.IgnoreCase | RegexOptions.Multiline);
 
         private static readonly Regex RegexTagsEmbrulho = new(
             @"</?p[^>]*>|</?div[^>]*>|<br\s*/?>",
+            RegexOptions.IgnoreCase);
+
+        private static readonly Regex RegexMarkdownInline = new(
+            @"\[(?<texto>[^\]]+)\]\((?<url>https?://[^\s)]+)\)|`(?<codigo>[^`]+)`",
             RegexOptions.IgnoreCase);
 
         private static readonly HttpClient _http = new() { Timeout = TimeSpan.FromSeconds(15) };
@@ -56,7 +64,7 @@ namespace ElsEvo
 
         private void PrepararNotas(string notasBrutas)
         {
-            string texto = notasBrutas ?? string.Empty;
+            string texto = WebUtility.HtmlDecode(notasBrutas ?? string.Empty);
 
             var matches = RegexElementoEspecial.Matches(texto);
 
@@ -86,15 +94,20 @@ namespace ElsEvo
                 }
                 else if (match.Groups["citacao"].Success)
                 {
-                    string citacao = match.Groups["citacao"].Value.Trim().Trim('"', '“', '”');
+                    string citacao = LimparMarkdownSimples(match.Groups["citacao"].Value.Trim().Trim('"', '“', '”'));
                     AdicionarCitacao(citacao);
                     adicionouAlgumElemento = true;
                 }
                 else if (match.Groups["citacaoHtml"].Success)
                 {
 
-                    string citacao = LimparHtmlInterno(match.Groups["citacaoHtml"].Value).Trim('"', '“', '”');
+                    string citacao = LimparMarkdownSimples(LimparHtmlInterno(match.Groups["citacaoHtml"].Value).Trim('"', '“', '”'));
                     AdicionarCitacao(citacao);
+                    adicionouAlgumElemento = true;
+                }
+                else if (match.Groups["itemLista"].Success)
+                {
+                    AdicionarItemLista(match.Groups["itemLista"].Value.Trim());
                     adicionouAlgumElemento = true;
                 }
                 else if (match.Groups["tituloMd"].Success)
@@ -136,16 +149,76 @@ namespace ElsEvo
             if (string.IsNullOrWhiteSpace(limpo))
                 return false;
 
-            PainelNotas.Children.Add(new TextBlock
+            var texto = new TextBlock
             {
-                Text = WebUtility.HtmlDecode(limpo),
                 Foreground = (System.Windows.Media.Brush)FindResource("CorTextoSecundario"),
                 FontSize = 12,
                 TextWrapping = TextWrapping.Wrap,
                 LineHeight = 17,
                 Margin = new Thickness(0, 0, 0, 10)
-            });
+            };
+
+            AdicionarInlinesFormatados(texto, limpo);
+            PainelNotas.Children.Add(texto);
             return true;
+        }
+
+        private static string LimparMarkdownSimples(string texto)
+        {
+            return Regex.Replace(texto, @"\*{1,3}|_{1,3}", string.Empty).Trim();
+        }
+
+        private static void AdicionarInlinesFormatados(TextBlock destino, string texto)
+        {
+            int posicaoAtual = 0;
+            foreach (Match match in RegexMarkdownInline.Matches(texto))
+            {
+                if (match.Index > posicaoAtual)
+                    destino.Inlines.Add(new Run(WebUtility.HtmlDecode(texto.Substring(posicaoAtual, match.Index - posicaoAtual))));
+
+                if (match.Groups["url"].Success)
+                {
+                    var link = new Hyperlink(new Run(WebUtility.HtmlDecode(match.Groups["texto"].Value)))
+                    {
+                        NavigateUri = new Uri(match.Groups["url"].Value),
+                        Foreground = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(99, 179, 237))
+                    };
+                    link.RequestNavigate += AbrirLink;
+                    destino.Inlines.Add(link);
+                }
+                else
+                {
+                    destino.Inlines.Add(new InlineUIContainer
+                    {
+                        BaselineAlignment = BaselineAlignment.Center,
+                        Child = new Border
+                        {
+                            Background = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(37, 42, 51)),
+                            CornerRadius = new CornerRadius(3),
+                            Padding = new Thickness(4, 1, 4, 1),
+                            Child = new TextBlock
+                            {
+                                Text = WebUtility.HtmlDecode(match.Groups["codigo"].Value),
+                                Foreground = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(226, 232, 240)),
+                                FontSize = 11
+                            }
+                        }
+                    });
+                }
+                posicaoAtual = match.Index + match.Length;
+            }
+
+            if (posicaoAtual < texto.Length)
+                destino.Inlines.Add(new Run(WebUtility.HtmlDecode(texto.Substring(posicaoAtual))));
+        }
+
+        private static void AbrirLink(object sender, RequestNavigateEventArgs evento)
+        {
+            if (evento.Uri.Scheme is "http" or "https")
+            {
+                Process.Start(new ProcessStartInfo(evento.Uri.AbsoluteUri) { UseShellExecute = true });
+                evento.Handled = true;
+            }
         }
 
         private void AdicionarImagem(string url)
@@ -210,6 +283,24 @@ namespace ElsEvo
                 TextWrapping = TextWrapping.Wrap,
                 Margin = new Thickness(0, 0, 0, 8)
             });
+        }
+
+        private void AdicionarItemLista(string item)
+        {
+            if (string.IsNullOrWhiteSpace(item))
+                return;
+
+            var texto = new TextBlock
+            {
+                Foreground = (System.Windows.Media.Brush)FindResource("CorTextoSecundario"),
+                FontSize = 12,
+                TextWrapping = TextWrapping.Wrap,
+                LineHeight = 17,
+                Margin = new Thickness(0, 0, 0, 4)
+            };
+            texto.Inlines.Add(new Run("• "));
+            AdicionarInlinesFormatados(texto, LimparMarkdownSimples(item));
+            PainelNotas.Children.Add(texto);
         }
 
         private async Task CarregarImagemAsync(string url, Image imagem, Border container)
