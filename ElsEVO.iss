@@ -1,6 +1,6 @@
 #define MyAppName "ElsEvo"
 #ifndef MyAppVersion
-  #define MyAppVersion "1.0.5"
+  #define MyAppVersion "1.1.0"
 #endif
 #define MyAppPublisher "AyameJk"
 #define MyAppURL "https://ayamejk.github.io/ElsEvo/"
