@@ -234,7 +234,7 @@
                             <TextBlock Grid.Column="0" Text="&#xE7E7;" Style="{StaticResource IconeMdl2}"/>
 
                             <StackPanel Grid.Column="1">
-                                <CheckBox x:Name="ChkMinimizarBandeja" Content="Minimizar para a área de notificação" IsChecked="True"/>
+                                <CheckBox x:Name="ChkMinimizarBandeja" Content="Minimizar para a área de notificação"/>
                                 <CheckBox x:Name="ChkIniciarMinimizado" Content="Iniciar minimizado" Margin="0,4,0,0"/>
                                 <CheckBox x:Name="ChkIniciarComWindows" Content="Iniciar com o Windows" Margin="0,4,0,0"/>
                             </StackPanel>
@@ -251,7 +251,7 @@
                             <TextBlock Grid.Column="0" Text="&#xE72C;" Style="{StaticResource IconeMdl2}"/>
 
                             <StackPanel Grid.Column="1">
-                                <CheckBox x:Name="ChkBuscarAtualizacoes" Content="Buscar por atualizações ao iniciar" IsChecked="True"/>
+                                <CheckBox x:Name="ChkBuscarAtualizacoes" Content="Buscar por atualizações ao iniciar"/>
                                 <CheckBox x:Name="ChkBetaApenas" Content="Beta apenas" Margin="0,4,0,0"/>
                                 <TextBlock x:Name="TxtAvisoBetaApenas" Text="Desmarcado: o programa busca apenas versões estáveis"
                                            Style="{StaticResource TextoSecundario}"

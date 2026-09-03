@@ -36,8 +36,8 @@ namespace ElsEvo.Properties
         public bool BetaFirstLaunch { get; set; } = true;
 
         public bool TemaClaro { get; set; } = true;
-        public bool IniciarComWindows { get; set; } = true;
-        public bool MinimizarParaBandeja { get; set; } = true;
+        public bool IniciarComWindows { get; set; } = false;
+        public bool MinimizarParaBandeja { get; set; } = false;
         public string Idioma { get; set; } = "pt";
 
         private static Settings Carregar()

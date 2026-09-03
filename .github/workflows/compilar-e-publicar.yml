@@ -11,7 +11,7 @@ permissions:
   contents: write
 
 env:
-  DOTNET_VERSION: '8.0.x'
+  DOTNET_VERSION: '10.0.x'
   PROJECT_FILE: 'ElsEvo.csproj'
   ISS_FILE: 'ElsEvo.iss'
   CAMINHO_INSTALADOR: ''
@@ -30,7 +30,7 @@ jobs:
         with:
           ref: main
 
-      - name: Configurar .NET 8
+      - name: Configurar .NET 10
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: ${{ env.DOTNET_VERSION }}
@@ -75,7 +75,7 @@ jobs:
       - name: Verificar se o executável foi gerado
         shell: pwsh
         run: |
-          $caminho = "bin\Release\net8.0-windows\win-x64\ElsEvo.exe"
+          $caminho = "bin\Release\net10.0-windows\win-x64\ElsEvo.exe"
           if (-not (Test-Path $caminho)) {
             Write-Error "ElsEvo.exe não foi encontrado em $caminho -- publish falhou silenciosamente."
             exit 1
@@ -120,7 +120,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: elsevo-build-${{ github.sha }}
-          path: bin/Release/net8.0-windows/win-x64/
+          path: bin/Release/net10.0-windows/win-x64/
           retention-days: 7
 
       - name: Anexar instalador na Release
