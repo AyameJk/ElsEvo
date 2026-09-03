@@ -211,7 +211,7 @@
                                          Margin="20,4,0,0"
                                          Padding="6,0"
                                          VerticalContentAlignment="Center"
-                                         IsEnabled="False"
+                                         IsReadOnly="True"
                                          Text="argumentos | ex: 8f9slxa02nkp29ak1u26mqpcms"/>
                             </StackPanel>
                         </Grid>
@@ -395,7 +395,7 @@
                             <TextBlock Grid.Column="0" Text="&#xE7BA;" Style="{StaticResource IconeMdl2}"/>
 
                             <StackPanel Grid.Column="1">
-                                <CheckBox x:Name="ChkAvisarRedeLimitada" Content="Avisar antes de baixar em rede limitada (medida)" IsChecked="True"/>
+                                <CheckBox x:Name="ChkAvisarRedeLimitada" Content="Avisar antes de baixar em rede limitada (medida)"/>
                                 <TextBlock Text="Ex.: hotspot do celular ou plano de dados com limite."
                                            Style="{StaticResource TextoSecundario}"
                                            Margin="20,4,0,0"/>

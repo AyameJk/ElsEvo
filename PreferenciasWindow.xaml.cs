@@ -133,7 +133,7 @@ namespace ElsEvo
             ChkNaoExecutarLauncher.IsChecked = cfg.WebLoginNeeded;
 
             ChkPularElsword.IsChecked = cfg.SkipLauncher;
-            TxtArgumentos.IsEnabled = cfg.SkipLauncher;
+            TxtArgumentos.IsReadOnly = !cfg.SkipLauncher;
 
             _ajustandoPlaceholder = true;
             if (string.IsNullOrWhiteSpace(cfg.X2Args))
@@ -229,7 +229,7 @@ namespace ElsEvo
 
         private void ChkPularElsword_CheckedChanged(object sender, RoutedEventArgs e)
         {
-            TxtArgumentos.IsEnabled = ChkPularElsword.IsChecked == true;
+            TxtArgumentos.IsReadOnly = ChkPularElsword.IsChecked != true;
         }
 
         private void AtualizarAparenciaPlaceholder(bool temCaminhoReal)

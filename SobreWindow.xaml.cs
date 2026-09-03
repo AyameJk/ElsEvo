@@ -18,7 +18,7 @@ namespace ElsEvo
             AplicarIdioma();
 
             BadgeBeta.Visibility = Visibility.Collapsed;
-            TxtVersaoBeta.Text = string.Format(Idiomas.T("SobreVersaoEstavel"), AppVersion.VersaoParaAtualizacao);
+            TxtVersaoBeta.Text = string.Format(Idiomas.T("SobreVersaoBeta"), AppVersion.VersaoParaAtualizacao);
             TxtVersaoBeta.Visibility = Visibility.Visible;
         }
 

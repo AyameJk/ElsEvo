@@ -76,7 +76,7 @@ namespace ElsEvo
                 ["IdiomaPortugues"] = "Português",
                 ["IdiomaIngles"] = "Inglês",
                 ["IdiomaChines"] = "Chinês",
-                ["SobreVersaoBeta"] = "Versão Beta: {0}"
+                ["SobreVersaoBeta"] = "Versão estável: {0}"
             },
             ["en"] = new()
             {
@@ -145,7 +145,7 @@ namespace ElsEvo
                 ["IdiomaPortugues"] = "Portuguese",
                 ["IdiomaIngles"] = "English",
                 ["IdiomaChines"] = "Chinese",
-                ["SobreVersaoBeta"] = "Beta version: {0}"
+                ["SobreVersaoBeta"] = "Stable version: {0}"
             },
             ["zh"] = new()
             {
@@ -214,7 +214,7 @@ namespace ElsEvo
                 ["IdiomaPortugues"] = "葡萄牙语",
                 ["IdiomaIngles"] = "英语",
                 ["IdiomaChines"] = "中文",
-                ["SobreVersaoBeta"] = "测试版版本: {0}"
+                ["SobreVersaoBeta"] = "稳定版本: {0}"
             }
         };
 
