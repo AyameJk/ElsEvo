@@ -139,7 +139,7 @@ namespace ElsEvo
             if (string.IsNullOrWhiteSpace(cfg.X2Args))
             {
                 TxtArgumentos.Text = PlaceholderArgumentos;
-                TxtArgumentos.Foreground = (System.Windows.Media.Brush)FindResource("CorTextoSecundario");
+                TxtArgumentos.Foreground = ObterCorPlaceholder();
             }
             else
             {
@@ -239,6 +239,11 @@ namespace ElsEvo
                 : (System.Windows.Media.Brush)FindResource("CorTextoSecundario");
         }
 
+        private System.Windows.Media.Brush ObterCorPlaceholder() =>
+            Properties.Settings.Default.TemaClaro
+                ? new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(74, 74, 74))
+                : (System.Windows.Media.Brush)FindResource("CorTextoSecundario");
+
         private void TxtArgumentos_GotFocus(object sender, RoutedEventArgs e)
         {
             if (TxtArgumentos.Text == PlaceholderArgumentos)
@@ -256,7 +261,7 @@ namespace ElsEvo
             {
                 _ajustandoPlaceholder = true;
                 TxtArgumentos.Text = PlaceholderArgumentos;
-                TxtArgumentos.Foreground = (System.Windows.Media.Brush)FindResource("CorTextoSecundario");
+                TxtArgumentos.Foreground = ObterCorPlaceholder();
                 _ajustandoPlaceholder = false;
             }
         }
